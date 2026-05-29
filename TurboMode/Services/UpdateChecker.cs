@@ -4,11 +4,6 @@ using System.Text.Json;
 
 namespace TurboMode.Services;
 
-/// <summary>
-/// GitHub releases endpoint'inden son sürümü kontrol eder.
-/// Yeni varsa bildirim için UpdateAvailable event'i tetikler.
-/// Repo bilgisi sabit; fork edenler RepoOwner/RepoName'i değiştirir.
-/// </summary>
 public static class UpdateChecker
 {
     public const string RepoOwner = "baristilki";
@@ -16,7 +11,13 @@ public static class UpdateChecker
     public static string RepoUrl => $"https://github.com/{RepoOwner}/{RepoName}";
     public static string ReleasesUrl => $"{RepoUrl}/releases";
 
-    public sealed record UpdateInfo(string LatestVersion, string CurrentVersion, string ReleaseUrl, bool IsNewer);
+    public sealed record UpdateInfo(
+        string LatestVersion,
+        string CurrentVersion,
+        string ReleaseUrl,
+        string? DownloadUrl,
+        long DownloadSize,
+        bool IsNewer);
 
     public static async Task<UpdateInfo?> CheckAsync()
     {
@@ -32,11 +33,28 @@ public static class UpdateChecker
             var tag = doc.RootElement.GetProperty("tag_name").GetString() ?? "";
             var htmlUrl = doc.RootElement.GetProperty("html_url").GetString() ?? "";
 
+            // FoxTurboMod.exe asset'ini bul
+            string? downloadUrl = null;
+            long downloadSize = 0;
+            if (doc.RootElement.TryGetProperty("assets", out var assets))
+            {
+                foreach (var asset in assets.EnumerateArray())
+                {
+                    var name = asset.GetProperty("name").GetString();
+                    if (name != null && name.Equals("FoxTurboMod.exe", StringComparison.OrdinalIgnoreCase))
+                    {
+                        downloadUrl = asset.GetProperty("browser_download_url").GetString();
+                        downloadSize = asset.GetProperty("size").GetInt64();
+                        break;
+                    }
+                }
+            }
+
             var current = Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "0.0.0";
             var latest = tag.TrimStart('v', 'V');
-
             bool isNewer = CompareVersions(latest, current) > 0;
-            return new UpdateInfo(latest, current, htmlUrl, isNewer);
+
+            return new UpdateInfo(latest, current, htmlUrl, downloadUrl, downloadSize, isNewer);
         }
         catch { return null; }
     }

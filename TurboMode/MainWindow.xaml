@@ -29,17 +29,27 @@
             <RowDefinition Height="Auto" />   <!-- Footer -->
         </Grid.RowDefinitions>
 
-        <!-- Başlık (sadece logo + isim, butonlar ayrı satır) -->
+        <!-- Başlık (logo + isim + version chip + uptime chip) -->
         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
             <Image Source="/Resources/FoxLogo.png" Width="40" Height="40" Margin="0,0,12,0" />
             <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="FOX TURBO MOD" FontSize="20" FontWeight="Bold"
                            Foreground="{StaticResource TextPrimary}" />
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Text="{Binding VersionLabel}" FontSize="11"
-                               Foreground="{StaticResource TextSecondary}" />
+                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                    <!-- Version chip -->
+                    <Border Background="#1F1F28" CornerRadius="10" Padding="8,2">
+                        <TextBlock Text="{Binding VersionLabel}" FontSize="10"
+                                   Foreground="{StaticResource TextSecondary}" />
+                    </Border>
+                    <!-- Uptime chip -->
+                    <Border Background="#2A1F14" CornerRadius="10" Padding="8,2" Margin="6,0,0,0">
+                        <TextBlock Text="{Binding UptimeLabel}" FontSize="10"
+                                   Foreground="{StaticResource AccentBrush}" />
+                    </Border>
+                    <!-- Update banner -->
                     <TextBlock Text="{Binding UpdateBanner}" FontSize="11"
-                               Foreground="{StaticResource AccentBrush}" Margin="8,0,0,0"
+                               Foreground="{StaticResource AccentBrush}" Margin="8,2,0,0"
+                               VerticalAlignment="Center"
                                Cursor="Hand" MouseLeftButtonUp="OpenUpdate_Click" />
                 </StackPanel>
             </StackPanel>
@@ -48,16 +58,19 @@
         <!-- Buton bar (alt satır) -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right"
                     Margin="0,0,0,12">
+            <Button Content="🚀 Öneriler" Cursor="Hand" Click="Recommendations_Click"
+                    Background="#2A1F14" BorderBrush="{StaticResource AccentBrush}"
+                    Foreground="{StaticResource AccentBrush}" Padding="12,5" Margin="0,0,6,0" />
             <Button Content="📊 Geçmiş" Cursor="Hand" Click="History_Click"
                     Background="Transparent" BorderBrush="{StaticResource BorderBrushDim}"
                     Foreground="{StaticResource TextPrimary}" Padding="12,5" Margin="0,0,6,0" />
             <Button Content="🛡 Beyaz Liste" Cursor="Hand" Click="Whitelist_Click"
                     Background="Transparent" BorderBrush="{StaticResource BorderBrushDim}"
                     Foreground="{StaticResource TextPrimary}" Padding="12,5" Margin="0,0,6,0" />
-            <Button Content="ℹ Hakkında" Cursor="Hand"
+            <Button Content="ℹ" Cursor="Hand"
                     Command="{Binding ToggleAboutCommand}"
                     Background="Transparent" BorderBrush="{StaticResource BorderBrushDim}"
-                    Foreground="{StaticResource TextSecondary}" Padding="12,5" />
+                    Foreground="{StaticResource TextSecondary}" Padding="10,5" />
         </StackPanel>
 
         <!-- Hakkında paneli -->
@@ -150,9 +163,10 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="🧊 Donduruldu" FontSize="11"
-                                   Foreground="{StaticResource TextSecondary}" />
+                    <StackPanel Grid.Column="0" Cursor="Hand" MouseLeftButtonUp="SuspendedDetails_Click"
+                                ToolTip="Hangi süreçler donduruldu? Tıkla">
+                        <TextBlock Text="🧊 Donduruldu ↗" FontSize="11"
+                                   Foreground="{StaticResource AccentBrush}" />
                         <TextBlock Text="{Binding ResultSuspendedText}" FontSize="14" FontWeight="SemiBold"
                                    Foreground="{StaticResource TextPrimary}" Margin="0,2,0,0" />
                     </StackPanel>
@@ -308,7 +322,8 @@
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Width="110" Height="130" Margin="5" CornerRadius="10"
-                                        Background="#16161D" BorderThickness="0">
+                                        Background="#16161D" BorderThickness="0"
+                                        Cursor="Hand" MouseLeftButtonUp="Game_Click">
                                     <Border.Style>
                                         <Style TargetType="Border">
                                             <Style.Triggers>
@@ -323,6 +338,9 @@
                                     </Border.Effect>
                                     <Border.ToolTip>
                                         <TextBlock>
+                                            <Run Text="▶ Başlatmak için tıkla" FontWeight="SemiBold"
+                                                 Foreground="#FF7A29" />
+                                            <LineBreak />
                                             <Run Text="{Binding DisplayName}" FontWeight="SemiBold" />
                                             <LineBreak />
                                             <Run Text="{Binding Platform}" Foreground="#AAA" />

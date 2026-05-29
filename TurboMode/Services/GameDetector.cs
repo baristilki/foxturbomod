@@ -85,11 +85,23 @@ public sealed class GameDetector : IDisposable
         ["MarvelRivals.exe"] = "Marvel Rivals",
         ["Helldivers2.exe"] = "Helldivers 2",
         ["Palworld-Win64-Shipping.exe"] = "Palworld",
+
+        // Delta Force (Tencent / TiMi Studios — 2024)
+        ["DeltaForceClient-Win64-Shipping.exe"] = "Delta Force",
+        ["DeltaForce-Win64-Shipping.exe"] = "Delta Force",
+        ["DeltaForceClient.exe"] = "Delta Force",
+        ["DeltaForce.exe"] = "Delta Force",
+        ["dfhd.exe"] = "Delta Force",
+        ["DeltaForceLauncher.exe"] = "Delta Force (Launcher)",
+        ["thunder.exe"] = "Delta Force (Tencent Launcher)",
+        ["wegame.exe"] = "WeGame (Tencent)",
     };
 
     public void Start()
     {
-        // Mevcut oyunu kontrol et (uygulama açılırken zaten oyun çalışıyor olabilir).
+        // Mevcut oyunu state olarak kaydet ama event fire ETME —
+        // uygulama açıldığında çalışan oyunda Turbo otomatik aktif olmamalı.
+        // Sadece yeni başlatılan oyunlarda WMI event ile auto-activate olsun.
         foreach (var p in Process.GetProcesses())
         {
             try
@@ -99,7 +111,6 @@ public sealed class GameDetector : IDisposable
                 {
                     CurrentGame = name;
                     _currentProcess = p.ProcessName;
-                    GameStarted?.Invoke(name, p.ProcessName);
                     break;
                 }
             }
@@ -108,52 +119,72 @@ public sealed class GameDetector : IDisposable
         }
 
         // WMI event watchers
+        // ÖNEMLİ: Win32_ProcessStartTrace process adını 15 karaktere kısaltıyor (kernel format).
+        // Bunun yerine __InstanceCreationEvent + Win32_Process kullanıyoruz — tam ad gelir.
         try
         {
             var startQuery = new WqlEventQuery(
-                "SELECT * FROM Win32_ProcessStartTrace");
+                "SELECT * FROM __InstanceCreationEvent WITHIN 2 WHERE TargetInstance ISA 'Win32_Process'");
             _startWatcher = new ManagementEventWatcher(startQuery);
-            _startWatcher.EventArrived += OnProcessStarted;
+            _startWatcher.EventArrived += OnProcessCreated;
             _startWatcher.Start();
 
             var stopQuery = new WqlEventQuery(
-                "SELECT * FROM Win32_ProcessStopTrace");
+                "SELECT * FROM __InstanceDeletionEvent WITHIN 2 WHERE TargetInstance ISA 'Win32_Process'");
             _stopWatcher = new ManagementEventWatcher(stopQuery);
-            _stopWatcher.EventArrived += OnProcessStopped;
+            _stopWatcher.EventArrived += OnProcessDeleted;
             _stopWatcher.Start();
         }
         catch
         {
-            // WMI yoksa polling'e fallback — şimdilik sessizce geç. UI çalışmaya devam eder.
+            // WMI yoksa şimdilik sessizce geç. UI çalışmaya devam eder.
         }
     }
 
-    private void OnProcessStarted(object sender, EventArrivedEventArgs e)
+    private void OnProcessCreated(object sender, EventArrivedEventArgs e)
     {
-        var name = e.NewEvent.Properties["ProcessName"]?.Value?.ToString();
-        if (string.IsNullOrEmpty(name)) return;
-
-        if (KnownGames.TryGetValue(name, out var displayName))
+        try
         {
-            CurrentGame = displayName;
-            _currentProcess = name;
-            GameStarted?.Invoke(displayName, name);
+            var target = e.NewEvent["TargetInstance"] as ManagementBaseObject;
+            var name = target?["Name"]?.ToString();   // "DeltaForceClient-Win64-Shipping.exe" (TAM AD)
+            if (string.IsNullOrEmpty(name)) return;
+
+            if (KnownGames.TryGetValue(name, out var displayName))
+            {
+                // Process adı dictionary'de uzantılı ama biz internal'da uzantısız tutuyoruz
+                var procNameNoExt = name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)
+                    ? name.Substring(0, name.Length - 4)
+                    : name;
+                CurrentGame = displayName;
+                _currentProcess = procNameNoExt;
+                GameStarted?.Invoke(displayName, procNameNoExt);
+            }
         }
+        catch { }
     }
 
-    private void OnProcessStopped(object sender, EventArrivedEventArgs e)
+    private void OnProcessDeleted(object sender, EventArrivedEventArgs e)
     {
-        var name = e.NewEvent.Properties["ProcessName"]?.Value?.ToString();
-        if (string.IsNullOrEmpty(name)) return;
-
-        if (string.Equals(name, _currentProcess + ".exe", StringComparison.OrdinalIgnoreCase) ||
-            string.Equals(name, _currentProcess, StringComparison.OrdinalIgnoreCase))
+        try
         {
-            var ended = CurrentGame ?? "Bilinmiyor";
-            CurrentGame = null;
-            _currentProcess = null;
-            GameStopped?.Invoke(ended);
+            var target = e.NewEvent["TargetInstance"] as ManagementBaseObject;
+            var name = target?["Name"]?.ToString();
+            if (string.IsNullOrEmpty(name)) return;
+
+            // name "X.exe" gelir, _currentProcess uzantısız
+            var procNameNoExt = name.EndsWith(".exe", StringComparison.OrdinalIgnoreCase)
+                ? name.Substring(0, name.Length - 4)
+                : name;
+
+            if (string.Equals(procNameNoExt, _currentProcess, StringComparison.OrdinalIgnoreCase))
+            {
+                var ended = CurrentGame ?? "Bilinmiyor";
+                CurrentGame = null;
+                _currentProcess = null;
+                GameStopped?.Invoke(ended);
+            }
         }
+        catch { }
     }
 
     public void Dispose()

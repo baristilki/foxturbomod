@@ -12,8 +12,14 @@ namespace TurboMode.Services;
 public sealed class ProcessOptimizer
 {
     private readonly HashSet<int> _suspendedPids = new();
+    private readonly List<string> _suspendedNames = new();
     private readonly object _lock = new();
     private readonly AppSettings _settings;
+
+    public IReadOnlyList<string> SuspendedProcessNames
+    {
+        get { lock (_lock) return _suspendedNames.ToArray(); }
+    }
 
     public ProcessOptimizer(AppSettings settings)
     {
@@ -53,7 +59,12 @@ public sealed class ProcessOptimizer
 
                 if (TrySuspend(p.Id))
                 {
-                    lock (_lock) _suspendedPids.Add(p.Id);
+                    lock (_lock)
+                    {
+                        _suspendedPids.Add(p.Id);
+                        if (!_suspendedNames.Contains(p.ProcessName, StringComparer.OrdinalIgnoreCase))
+                            _suspendedNames.Add(p.ProcessName);
+                    }
                     count++;
                 }
             }
@@ -70,6 +81,7 @@ public sealed class ProcessOptimizer
         {
             snapshot = _suspendedPids.ToArray();
             _suspendedPids.Clear();
+            _suspendedNames.Clear();
         }
         foreach (var pid in snapshot)
         {

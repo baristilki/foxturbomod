@@ -11,8 +11,11 @@ namespace TurboMode.Services;
 public sealed class ServiceOptimizer
 {
     private readonly Dictionary<string, ServiceControllerStatus> _previousStatus = new();
+    private readonly List<string> _stoppedDisplayNames = new();
     private readonly HashSet<string> _blacklist = new(
         OptimizationTargets.ServiceBlacklist, StringComparer.OrdinalIgnoreCase);
+
+    public IReadOnlyList<string> StoppedServiceNames => _stoppedDisplayNames.ToArray();
 
     public int Activate()
     {
@@ -29,6 +32,7 @@ public sealed class ServiceOptimizer
                     _previousStatus[t.ServiceName] = prev;
                     sc.Stop();
                     sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(5));
+                    _stoppedDisplayNames.Add(t.DisplayName);
                     stopped++;
                 }
             }
@@ -59,5 +63,6 @@ public sealed class ServiceOptimizer
             }
         }
         _previousStatus.Clear();
+        _stoppedDisplayNames.Clear();
     }
 }

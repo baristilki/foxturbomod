@@ -29,7 +29,7 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
-                    <TextBlock Text="Bu Hafta Seans" FontSize="10"
+                    <TextBlock Text="Bu Hafta Oyun" FontSize="10"
                                Foreground="{StaticResource TextSecondary}" />
                     <TextBlock x:Name="WeekSessionsLabel" Text="—" FontSize="22"
                                FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
@@ -59,13 +59,13 @@
                 BorderBrush="{StaticResource BorderBrushDim}" BorderThickness="1"
                 CornerRadius="10">
             <DockPanel>
-                <TextBlock DockPanel.Dock="Top" Text="Son Seanslar"
+                <TextBlock DockPanel.Dock="Top" Text="Son Oyun Geçmişi"
                            Foreground="{StaticResource TextPrimary}"
                            FontWeight="SemiBold" Margin="16,12,16,8" />
 
                 <Grid>
                     <TextBlock x:Name="EmptyState"
-                               Text="Henüz seans kaydedilmedi.&#x0a;Bir oyun aç ve Fox Turbo Mod aktif iken oyna — burada otomatik birikecek."
+                               Text="Henüz oyun kaydedilmedi.&#x0a;Bir oyun aç ve Fox Turbo Mod aktif iken oyna — burada otomatik birikecek."
                                Foreground="{StaticResource TextSecondary}"
                                TextAlignment="Center" TextWrapping="Wrap"
                                HorizontalAlignment="Center" VerticalAlignment="Center"

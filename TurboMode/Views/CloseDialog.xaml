@@ -1,0 +1,42 @@
+<Window x:Class="TurboMode.Views.CloseDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="http://schemas.modernwpf.com/2019"
+        ui:WindowHelper.UseModernWindowStyle="True"
+        Title="Kapatma" Height="280" Width="440"
+        WindowStartupLocation="CenterOwner" ResizeMode="NoResize"
+        Background="#0E0E13" Icon="/Resources/FoxMod.ico">
+
+    <Grid Margin="22">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+            <TextBlock Text="🦊" FontSize="22" Margin="0,0,10,0" VerticalAlignment="Center" />
+            <TextBlock Text="Fox Turbo Mod kapatılsın mı?"
+                       FontSize="16" FontWeight="SemiBold"
+                       Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center" />
+        </StackPanel>
+
+        <TextBlock Grid.Row="1"
+                   Text="Arka planda kalırsa oyunlar otomatik algılanmaya devam eder ve Turbo otomatik açılır. Tamamen kapatırsan oyun açtığında manuel başlatman gerekir."
+                   Foreground="{StaticResource TextSecondary}" FontSize="12"
+                   TextWrapping="Wrap" Margin="0,0,0,16" />
+
+        <CheckBox Grid.Row="3" x:Name="DontAskAgain" Content="Bir daha sorma"
+                  Foreground="{StaticResource TextSecondary}" Margin="0,8,0,12" />
+
+        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="İptal" Width="80" Margin="0,0,6,0" Click="Cancel_Click" />
+            <Button Content="Tamamen Çık" Width="120" Margin="0,0,6,0" Click="Exit_Click" />
+            <Button Content="📍 Tepside Tut" Width="130"
+                    Background="{StaticResource AccentBrush}" Foreground="White"
+                    Click="Tray_Click" />
+        </StackPanel>
+    </Grid>
+</Window>

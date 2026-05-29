@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
@@ -32,6 +33,11 @@ public partial class MainViewModel : ObservableObject
     private SessionRecord? _currentSession;
     private ActivationResult? _lastResult;
 
+    public IReadOnlyList<string> LastSuspendedProcesses =>
+        _lastResult?.SuspendedProcessNames ?? Array.Empty<string>();
+    public IReadOnlyList<string> LastStoppedServices =>
+        _lastResult?.StoppedServiceNames ?? Array.Empty<string>();
+
     [ObservableProperty] private bool _turboEnabled;
     [ObservableProperty] private string _statusTitle = "Hazır";
     [ObservableProperty] private string _statusDetail = "Açmak için sağdaki düğmeyi kullanın. Oyun açıldığında otomatik devreye alınır.";
@@ -44,10 +50,14 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _libraryHeader = "Yüklü Oyunlar";
     [ObservableProperty] private string _libraryStatusText = "Taranıyor...";
     [ObservableProperty] private string _footerText = "Fox Turbo Mod • Değişiklikler oyun kapanınca otomatik geri alınır.";
-    [ObservableProperty] private string _versionLabel = "v1.2";
+    [ObservableProperty] private string _versionLabel =
+        "v" + (Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "?.?.?");
+    [ObservableProperty] private string _uptimeLabel = "🕒 Aktif: 0 dk";
+    private readonly DateTime _appStartedAt = DateTime.Now;
     [ObservableProperty] private string _weeklySummaryText = "Henüz veri yok";
     [ObservableProperty] private string _updateBanner = "";
     public string? UpdateUrl { get; private set; }
+    public UpdateChecker.UpdateInfo? PendingUpdate { get; private set; }
 
     [ObservableProperty] private Visibility _resultPanelVisibility = Visibility.Collapsed;
     [ObservableProperty] private string _resultSuspendedText = "0";
@@ -94,6 +104,13 @@ public partial class MainViewModel : ObservableObject
         _detector.GameStopped += OnGameStopped;
         _detector.Start();
 
+        // Açılışta zaten çalışan oyunu UI'da göster ama Turbo'yu otomatik açma
+        if (!string.IsNullOrEmpty(_detector.CurrentGame))
+        {
+            GameStatus = $"Algılandı: {_detector.CurrentGame}";
+            GameStatusColor = new SolidColorBrush(Color.FromRgb(0xFF, 0x7A, 0x29));
+        }
+
         _fps.FpsUpdated += fps =>
         {
             App.Current.Dispatcher.BeginInvoke(new Action(() => FpsLiveText = $"{fps:0} FPS"));
@@ -104,6 +121,29 @@ public partial class MainViewModel : ObservableObject
         _ = Task.Run(CheckSystemState);
         _ = Task.Run(CheckUpdateAsync);
         RefreshWeeklySummary();
+        StartUptimeTimer();
+    }
+
+    private void StartUptimeTimer()
+    {
+        UpdateUptimeLabel();
+        var t = new DispatcherTimer(DispatcherPriority.Background)
+        {
+            Interval = TimeSpan.FromSeconds(30)
+        };
+        t.Tick += (_, _) => UpdateUptimeLabel();
+        t.Start();
+    }
+
+    private void UpdateUptimeLabel()
+    {
+        var span = DateTime.Now - _appStartedAt;
+        if (span.TotalHours >= 1)
+            UptimeLabel = $"🕒 Aktif: {(int)span.TotalHours} sa {span.Minutes} dk";
+        else if (span.TotalMinutes >= 1)
+            UptimeLabel = $"🕒 Aktif: {span.Minutes} dk";
+        else
+            UptimeLabel = $"🕒 Aktif: {span.Seconds} sn";
     }
 
     private void RefreshWeeklySummary()
@@ -113,10 +153,10 @@ public partial class MainViewModel : ObservableObject
             var (count, avg, ram, time) = SessionHistoryStore.WeeklySummary();
             if (count == 0)
             {
-                WeeklySummaryText = "Henüz seans yok";
+                WeeklySummaryText = "Henüz oyun kaydı yok";
                 return;
             }
-            WeeklySummaryText = $"{count} seans • +{avg:0.0}% FPS • {ram} MB";
+            WeeklySummaryText = $"{count} oyun • +{avg:0.0}% FPS • {ram} MB";
         }
         catch { WeeklySummaryText = "—"; }
     }
@@ -129,8 +169,9 @@ public partial class MainViewModel : ObservableObject
         {
             App.Current.Dispatcher.Invoke(() =>
             {
-                UpdateBanner = $"  • v{info.LatestVersion} mevcut ↗";
+                UpdateBanner = $"  • v{info.LatestVersion} mevcut — Güncelle ↗";
                 UpdateUrl = info.ReleaseUrl;
+                PendingUpdate = info;
             });
         }
     }
@@ -201,6 +242,8 @@ public partial class MainViewModel : ObservableObject
             if (result.PriorityBoosted) extras.Add("🚀 Yüksek Öncelik");
             if (result.VisualEffectsMinimized) extras.Add("🎨 Görsel efekt min");
             if (result.CpuParkingDisabled) extras.Add("🔧 CPU parking off");
+            if (result.MmcssBoosted) extras.Add("🎯 MMCSS gaming");
+            if (result.MouseTweaked) extras.Add("🖱 Mouse accel off");
             if (Settings.EnableMemoryCleanup) extras.Add("🧠 Cache temiz");
             ResultExtrasText = string.Join("  •  ", extras);
 

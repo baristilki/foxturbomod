@@ -124,6 +124,7 @@ public static class OptimizationTargets
         new("Fax",           "Faks"),
         new("RetailDemo",    "Mağaza Demo Servisi"),
         new("PrintNotify",   "Yazıcı Genişletmeleri"),
+        new("W32Time",       "Windows Saat Senkronizasyonu"),
     };
 
     /// <summary>
