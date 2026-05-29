@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet --version)",
+      "Bash(dotnet build *)",
+      "Bash(where.exe dotnet *)",
+      "Read(//c/Program Files/dotnet/**)",
+      "Bash(find \"/c/Users/PC\" -iname \"*fox_007*\" 2>/dev/null | head -10; echo \"---\"; ls \"/c/Users/PC/Downloads/\" 2>/dev/null | head -20)",
+      "Read(//c/Users/PC/**)",
+      "Read(//c/Users/PC/Downloads//**)"
+    ]
+  }
+}

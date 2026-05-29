@@ -1,0 +1,24 @@
+# Build outputs
+bin/
+obj/
+publish/
+*.user
+*.suo
+
+# Visual Studio
+.vs/
+*.csproj.FileListAbsolute.txt
+
+# JetBrains
+.idea/
+
+# Resources (large binaries — keep PresentMon and icons in repo)
+# But ignore PresentMon if user pulled local copy with different version
+# Resources/PresentMon.exe  <- keep this committed
+
+# Generated
+*.pdb
+*.exe.config
+
+# Logs
+*.log
