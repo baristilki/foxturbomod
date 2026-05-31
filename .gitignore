@@ -2,8 +2,13 @@
 bin/
 obj/
 publish/
+publish_new/
 *.user
 *.suo
+
+# Built release binary — Releases sayfasına manuel yüklenir, repo'da olmamalı
+*.exe.bak
+FoxTurboMod.exe
 
 # Visual Studio
 .vs/
