@@ -113,6 +113,55 @@ public static class RecommendationsService
             });
         }
 
+        // DNS — Discord/sosyal medya erişim sorunu
+        list.Add(new Recommendation
+        {
+            IconEmoji = "🌐",
+            Severity = RecommendationSeverity.Info,
+            Title = "Discord açılmıyor? — Adım 1: DNS değiştir",
+            Description =
+                "Bazı ISP'ler DNS-tabanlı engelleme uygular. Cloudflare (1.1.1.1) DNS'e geçmek bunu çoğu durumda atlatır. " +
+                "Bu yetmezse aşağıdaki DPI Bypass'i dene.",
+            ActionLabel = "Cloudflare DNS + Discord Aç",
+            ActionCommand = "dns-and-discord",
+        });
+
+        list.Add(new Recommendation
+        {
+            IconEmoji = "🛡",
+            Severity = RecommendationSeverity.Info,
+            Title = "Discord hala açılmıyor? — Adım 2: DPI Bypass (GoodbyeDPI)",
+            Description =
+                "ISP, TLS Client Hello paketlerine DPI (Deep Packet Inspection) uygularsa DNS yetmez. " +
+                "GoodbyeDPI (açık kaynak, MIT) TLS paketlerini parçalayarak DPI'ı atlatır — Türkiye'de Discord için yaygın çözüm. " +
+                "Discord açıldıktan sonra arka planda çalışmaya devam eder. " +
+                "⚠ Valorant/Vanguard açmadan önce 'Durdur' demelisin.",
+            ActionLabel = "GoodbyeDPI Başlat + Discord Aç",
+            ActionCommand = "dpi-and-discord",
+        });
+
+        list.Add(new Recommendation
+        {
+            IconEmoji = "⏹",
+            Severity = RecommendationSeverity.Info,
+            Title = "GoodbyeDPI'i Durdur",
+            Description =
+                "DPI bypass'i kapat. Valorant/Vanguard açmadan önce mutlaka durdurmalısın — " +
+                "WinDivert kernel driver Vanguard ile çakışabilir.",
+            ActionLabel = "Durdur",
+            ActionCommand = "dpi-stop",
+        });
+
+        list.Add(new Recommendation
+        {
+            IconEmoji = "↩",
+            Severity = RecommendationSeverity.Info,
+            Title = "DNS'i otomatik ayara döndür",
+            Description = "DNS değişikliğini geri al, ISP'nin varsayılan DNS'ine dön.",
+            ActionLabel = "DNS'i Geri Al",
+            ActionCommand = "dns-restore",
+        });
+
         // Shader Cache temizleme
         list.Add(new Recommendation
         {

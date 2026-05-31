@@ -71,6 +71,16 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         Services.SafetyNet.RestoreIfDirty();
+        // GoodbyeDPI çalışıyorsa kapanırken durdur
+        try
+        {
+            foreach (var p in Process.GetProcessesByName("goodbyedpi"))
+            {
+                try { p.Kill(); } catch { }
+                finally { p.Dispose(); }
+            }
+        }
+        catch { }
         try { _instanceMutex?.ReleaseMutex(); _instanceMutex?.Dispose(); } catch { }
         base.OnExit(e);
     }

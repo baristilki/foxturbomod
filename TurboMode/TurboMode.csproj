@@ -7,9 +7,9 @@
     <AssemblyName>FoxTurboMod</AssemblyName>
     <Product>Fox Turbo Mod</Product>
     <Company>Fox Turbo Mod</Company>
-    <Version>1.3.1</Version>
-    <FileVersion>1.3.1</FileVersion>
-    <AssemblyVersion>1.3.1</AssemblyVersion>
+    <Version>1.5.0</Version>
+    <FileVersion>1.5.0</FileVersion>
+    <AssemblyVersion>1.5.0</AssemblyVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -26,6 +26,15 @@
     <Resource Include="Resources\default_game.png" />
     <EmbeddedResource Include="Resources\PresentMon.exe">
       <LogicalName>PresentMon.exe</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\GoodbyeDPI\goodbyedpi.exe">
+      <LogicalName>goodbyedpi.exe</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\GoodbyeDPI\WinDivert.dll">
+      <LogicalName>WinDivert.dll</LogicalName>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Resources\GoodbyeDPI\WinDivert64.sys">
+      <LogicalName>WinDivert64.sys</LogicalName>
     </EmbeddedResource>
   </ItemGroup>
 

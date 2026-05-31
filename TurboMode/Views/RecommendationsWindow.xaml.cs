@@ -11,6 +11,10 @@ namespace TurboMode.Views;
 
 public partial class RecommendationsWindow : Window
 {
+    // GoodbyeDPI instance — uygulama yaşam süresi boyunca yaşar.
+    // Pencere kapansa bile DPI bypass arka planda çalışmaya devam eder.
+    private static readonly DpiBypass _dpi = new();
+
     public RecommendationsWindow()
     {
         InitializeComponent();
@@ -123,6 +127,48 @@ public partial class RecommendationsWindow : Window
                 {
                     var rr = WindowsTweaks.OpenNvidiaControlPanel();
                     if (!rr.Success) Error(rr.Message);
+                    break;
+                }
+
+            case "dns-and-discord":
+                {
+                    if (!Confirm(
+                        "Aktif ağ adaptörlerinin DNS sunucusunu Cloudflare (1.1.1.1) yapacağım, " +
+                        "DNS cache'i temizleyeceğim ve Discord'u başlatacağım.\n\n" +
+                        "İstediğin zaman 'DNS'i Geri Al' diyebilirsin. Devam?", "DNS + Discord")) return;
+                    var rr = DnsOptimizer.OpenDiscordWithDns();
+                    if (rr.Success) Info(rr.Message, "DNS Değiştirildi");
+                    else Error(rr.Message);
+                    break;
+                }
+
+            case "dns-restore":
+                {
+                    var rr = DnsOptimizer.RestoreAutomatic();
+                    if (rr.Success) Info(rr.Message, "DNS Geri Yüklendi");
+                    else Error(rr.Message);
+                    break;
+                }
+
+            case "dpi-and-discord":
+                {
+                    if (!Confirm(
+                        "GoodbyeDPI başlatılacak (TLS paketlerini parçalayarak DPI engellemesini atlatır) " +
+                        "ve Discord açılacak.\n\n" +
+                        "• Kernel driver yüklenir (WinDivert) — yasal, açık kaynak (MIT).\n" +
+                        "• Valorant/Vanguard açmadan önce mutlaka 'Durdur' butonuna bas — driver çakışması olabilir.\n" +
+                        "• Tüm internet trafiğin parçalandığı için %1-2 latency artışı olabilir.\n\n" +
+                        "Devam?", "DPI Bypass + Discord")) return;
+                    var rr = _dpi.OpenDiscordWithBypass();
+                    if (rr.Success) Info(rr.Message, "DPI Bypass Aktif");
+                    else Error(rr.Message);
+                    break;
+                }
+
+            case "dpi-stop":
+                {
+                    var rr = _dpi.Stop();
+                    Info(rr.Message, "GoodbyeDPI");
                     break;
                 }
         }
