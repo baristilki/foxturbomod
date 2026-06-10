@@ -34,6 +34,23 @@ public partial class App : Application
         }
 
         DispatcherUnhandledException += OnUnhandledException;
+        AppDomain.CurrentDomain.UnhandledException += (_, args) =>
+        {
+            Services.Log.Error(args.ExceptionObject as Exception, "AppDomain unhandled");
+        };
+
+        // Tema yükle
+        try
+        {
+            var settings = Services.ProfileStore.Load();
+            var theme = Services.ThemeManager.Parse(settings.Theme);
+            Services.ThemeManager.Apply(theme);
+        }
+        catch (Exception ex) { Services.Log.Error(ex, "Tema yüklenemedi"); }
+
+        Services.Log.Info("Fox Turbo Mod başlatıldı (v{0})",
+            System.Reflection.Assembly.GetExecutingAssembly().GetName().Version);
+
         base.OnStartup(e);
     }
 
@@ -71,16 +88,17 @@ public partial class App : Application
     protected override void OnExit(ExitEventArgs e)
     {
         Services.SafetyNet.RestoreIfDirty();
-        // GoodbyeDPI çalışıyorsa kapanırken durdur
+        // Tüm açık WPF pencerelerini kapat (overlay dahil)
         try
         {
-            foreach (var p in Process.GetProcessesByName("goodbyedpi"))
+            foreach (Window w in Windows)
             {
-                try { p.Kill(); } catch { }
-                finally { p.Dispose(); }
+                try { w.Close(); } catch { }
             }
         }
         catch { }
+        // NOT: GoodbyeDPI'yi BİLEREK öldürmüyoruz — kullanıcı Fox kapatılsa da
+        // arka planda DPI bypass'ın çalışmasını istiyor.
         try { _instanceMutex?.ReleaseMutex(); _instanceMutex?.Dispose(); } catch { }
         base.OnExit(e);
     }

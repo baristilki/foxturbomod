@@ -11,9 +11,8 @@ public partial class HistoryWindow : Window
         try { Load(); }
         catch (Exception ex)
         {
-            System.Windows.MessageBox.Show(
-                "Geçmiş yüklenemedi:\n\n" + ex.Message,
-                "Fox Turbo Mod", MessageBoxButton.OK, MessageBoxImage.Warning);
+            FoxDialog.Warn(this, "Fox Turbo Mod",
+                "Geçmiş yüklenemedi:\n\n" + ex.Message);
         }
     }
 

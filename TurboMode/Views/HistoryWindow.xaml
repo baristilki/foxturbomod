@@ -5,7 +5,7 @@
         ui:WindowHelper.UseModernWindowStyle="True"
         Title="Geçmiş ve İstatistikler" Height="640" Width="640"
         WindowStartupLocation="CenterOwner"
-        Background="#0E0E13"
+        Background="{DynamicResource WindowBackground}"
         Icon="/Resources/FoxMod.ico">
 
     <Grid Margin="20">
@@ -17,9 +17,9 @@
 
         <TextBlock Grid.Row="0" Text="📊 Geçmiş ve İstatistikler"
                    FontSize="18" FontWeight="SemiBold"
-                   Foreground="{StaticResource TextPrimary}" Margin="0,0,0,16" />
+                   Foreground="{DynamicResource TextPrimary}" Margin="0,0,0,16" />
 
-        <Border Grid.Row="1" Background="#1A1410" BorderBrush="{StaticResource AccentBrush}"
+        <Border Grid.Row="1" Background="#1A1410" BorderBrush="{DynamicResource AccentBrush}"
                 BorderThickness="1" CornerRadius="10" Padding="20,14" Margin="0,0,0,16">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -30,43 +30,43 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <TextBlock Text="Bu Hafta Oyun" FontSize="10"
-                               Foreground="{StaticResource TextSecondary}" />
+                               Foreground="{DynamicResource TextSecondary}" />
                     <TextBlock x:Name="WeekSessionsLabel" Text="—" FontSize="22"
-                               FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
+                               FontWeight="Bold" Foreground="{DynamicResource TextPrimary}" />
                 </StackPanel>
                 <StackPanel Grid.Column="1">
                     <TextBlock Text="Ort. FPS Kazancı" FontSize="10"
-                               Foreground="{StaticResource TextSecondary}" />
+                               Foreground="{DynamicResource TextSecondary}" />
                     <TextBlock x:Name="WeekAvgFpsLabel" Text="—" FontSize="22"
-                               FontWeight="Bold" Foreground="{StaticResource AccentBrush}" />
+                               FontWeight="Bold" Foreground="{DynamicResource AccentBrush}" />
                 </StackPanel>
                 <StackPanel Grid.Column="2">
                     <TextBlock Text="Toplam Aktif" FontSize="10"
-                               Foreground="{StaticResource TextSecondary}" />
+                               Foreground="{DynamicResource TextSecondary}" />
                     <TextBlock x:Name="WeekTotalTimeLabel" Text="—" FontSize="22"
-                               FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
+                               FontWeight="Bold" Foreground="{DynamicResource TextPrimary}" />
                 </StackPanel>
                 <StackPanel Grid.Column="3">
                     <TextBlock Text="RAM Serbest" FontSize="10"
-                               Foreground="{StaticResource TextSecondary}" />
+                               Foreground="{DynamicResource TextSecondary}" />
                     <TextBlock x:Name="WeekRamLabel" Text="—" FontSize="22"
-                               FontWeight="Bold" Foreground="{StaticResource TextPrimary}" />
+                               FontWeight="Bold" Foreground="{DynamicResource TextPrimary}" />
                 </StackPanel>
             </Grid>
         </Border>
 
-        <Border Grid.Row="2" Background="{StaticResource PanelBrushDim}"
-                BorderBrush="{StaticResource BorderBrushDim}" BorderThickness="1"
+        <Border Grid.Row="2" Background="{DynamicResource PanelBrushDim}"
+                BorderBrush="{DynamicResource BorderBrushDim}" BorderThickness="1"
                 CornerRadius="10">
             <DockPanel>
                 <TextBlock DockPanel.Dock="Top" Text="Son Oyun Geçmişi"
-                           Foreground="{StaticResource TextPrimary}"
+                           Foreground="{DynamicResource TextPrimary}"
                            FontWeight="SemiBold" Margin="16,12,16,8" />
 
                 <Grid>
                     <TextBlock x:Name="EmptyState"
                                Text="Henüz oyun kaydedilmedi.&#x0a;Bir oyun aç ve Fox Turbo Mod aktif iken oyna — burada otomatik birikecek."
-                               Foreground="{StaticResource TextSecondary}"
+                               Foreground="{DynamicResource TextSecondary}"
                                TextAlignment="Center" TextWrapping="Wrap"
                                HorizontalAlignment="Center" VerticalAlignment="Center"
                                FontSize="13" Visibility="Collapsed" />
@@ -85,19 +85,19 @@
                                             </Grid.ColumnDefinitions>
                                             <StackPanel Grid.Column="0">
                                                 <TextBlock Text="{Binding GameName}"
-                                                           Foreground="{StaticResource TextPrimary}"
+                                                           Foreground="{DynamicResource TextPrimary}"
                                                            FontWeight="SemiBold" />
-                                                <TextBlock Foreground="{StaticResource TextSecondary}" FontSize="10">
-                                                    <Run Text="{Binding StartedUtc, StringFormat=dd MMM HH:mm}" />
+                                                <TextBlock Foreground="{DynamicResource TextSecondary}" FontSize="10">
+                                                    <Run Text="{Binding StartedUtc, StringFormat=dd MMM HH:mm, Mode=OneWay}" />
                                                     <Run Text=" • " />
-                                                    <Run Text="{Binding DurationLabel}" />
+                                                    <Run Text="{Binding DurationLabel, Mode=OneWay}" />
                                                 </TextBlock>
                                             </StackPanel>
                                             <StackPanel Grid.Column="1" Width="80">
                                                 <TextBlock Text="FPS" FontSize="9"
-                                                           Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center" />
+                                                           Foreground="{DynamicResource TextSecondary}" HorizontalAlignment="Center" />
                                                 <TextBlock FontSize="12" HorizontalAlignment="Center"
-                                                           Foreground="{StaticResource TextPrimary}">
+                                                           Foreground="{DynamicResource TextPrimary}">
                                                     <Run Text="{Binding BaselineFps, StringFormat=N0}" />
                                                     <Run Text=" → " />
                                                     <Run Text="{Binding ActiveFps, StringFormat=N0}" />
@@ -105,17 +105,17 @@
                                             </StackPanel>
                                             <StackPanel Grid.Column="2" Width="70">
                                                 <TextBlock Text="Kazanç" FontSize="9"
-                                                           Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center" />
+                                                           Foreground="{DynamicResource TextSecondary}" HorizontalAlignment="Center" />
                                                 <TextBlock Text="{Binding FpsGainPercent, StringFormat=+0.0;-0.0;0}"
                                                            FontSize="13" FontWeight="SemiBold"
-                                                           Foreground="{StaticResource AccentBrush}"
+                                                           Foreground="{DynamicResource AccentBrush}"
                                                            HorizontalAlignment="Center" />
                                             </StackPanel>
                                             <StackPanel Grid.Column="3" Width="80">
                                                 <TextBlock Text="RAM" FontSize="9"
-                                                           Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Center" />
+                                                           Foreground="{DynamicResource TextSecondary}" HorizontalAlignment="Center" />
                                                 <TextBlock FontSize="12" HorizontalAlignment="Center"
-                                                           Foreground="{StaticResource TextPrimary}">
+                                                           Foreground="{DynamicResource TextPrimary}">
                                                     <Run Text="{Binding RamFreedMb}" />
                                                     <Run Text=" MB" />
                                                 </TextBlock>

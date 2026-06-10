@@ -76,6 +76,55 @@ public static class WindowsTweaks
     }
 
     /// <summary>
+    /// %TEMP% ve C:\Windows\Temp klasörlerini temizler.
+    /// Kullanımdaki dosyalar atlanır (sıfır risk).
+    /// </summary>
+    public static Result CleanTempFolders()
+    {
+        var paths = new[]
+        {
+            Environment.GetEnvironmentVariable("TEMP") ?? "",
+            Environment.GetEnvironmentVariable("TMP") ?? "",
+            @"C:\Windows\Temp",
+        }.Where(p => !string.IsNullOrEmpty(p)).Distinct().ToArray();
+
+        int deletedFiles = 0;
+        long freedBytes = 0;
+        var errors = new List<string>();
+        foreach (var path in paths)
+        {
+            if (!System.IO.Directory.Exists(path)) continue;
+            try
+            {
+                foreach (var f in System.IO.Directory.EnumerateFiles(path, "*", System.IO.SearchOption.AllDirectories))
+                {
+                    try
+                    {
+                        var len = new System.IO.FileInfo(f).Length;
+                        System.IO.File.Delete(f);
+                        deletedFiles++;
+                        freedBytes += len;
+                    }
+                    catch { /* kullanımda - geç */ }
+                }
+                // Boş klasörleri de temizle
+                foreach (var d in System.IO.Directory.EnumerateDirectories(path, "*", System.IO.SearchOption.AllDirectories).Reverse())
+                {
+                    try { if (!System.IO.Directory.EnumerateFileSystemEntries(d).Any()) System.IO.Directory.Delete(d); } catch { }
+                }
+            }
+            catch (Exception ex)
+            {
+                errors.Add($"{System.IO.Path.GetFileName(path)}: {ex.Message}");
+            }
+        }
+        var mb = Math.Round(freedBytes / 1024.0 / 1024.0, 1);
+        var msg = $"✓ {deletedFiles} dosya silindi\n✓ {mb} MB serbest";
+        if (errors.Count > 0) msg += $"\n\nUyarılar:\n{string.Join("\n", errors.Take(3))}";
+        return new Result(true, msg);
+    }
+
+    /// <summary>
     /// NVIDIA Control Panel'i açar (varsa).
     /// </summary>
     public static Result OpenNvidiaControlPanel()

@@ -24,13 +24,11 @@ public sealed class GameDetector : IDisposable
     /// </summary>
     private static readonly Dictionary<string, string> KnownGames = new(StringComparer.OrdinalIgnoreCase)
     {
-        // Riot — hem launcher hem in-game süreçlerini izle ki kullanıcı launcher'ı açar açmaz tespit edelim
+        // Riot — SADECE gerçek oyun süreçleri (launcher'lar değil)
+        // Launcher'lar (LeagueClient, RiotClientServices) ETW frame yayınlamıyor — FPS ölçülemiyor
+        // Kullanıcı maça girdiğinde (League of Legends.exe başlar) Turbo otomatik açılır
         ["VALORANT-Win64-Shipping.exe"] = "Valorant",
         ["VALORANT.exe"] = "Valorant",
-        ["RiotClientServices.exe"] = "Riot Client",
-        ["LeagueClient.exe"] = "League of Legends",
-        ["LeagueClientUx.exe"] = "League of Legends",
-        ["LeagueClientUxRender.exe"] = "League of Legends",
         ["LeagueofLegends.exe"] = "League of Legends",
         ["League of Legends.exe"] = "League of Legends",
         ["cs2.exe"] = "Counter-Strike 2",
@@ -92,9 +90,7 @@ public sealed class GameDetector : IDisposable
         ["DeltaForceClient.exe"] = "Delta Force",
         ["DeltaForce.exe"] = "Delta Force",
         ["dfhd.exe"] = "Delta Force",
-        ["DeltaForceLauncher.exe"] = "Delta Force (Launcher)",
-        ["thunder.exe"] = "Delta Force (Tencent Launcher)",
-        ["wegame.exe"] = "WeGame (Tencent)",
+        // Launcher entry'leri (DeltaForceLauncher, thunder, wegame) kaldırıldı — sadece gerçek oyun süreçleri
     };
 
     public void Start()

@@ -2,11 +2,11 @@
 
 <img src="TurboMode/Resources/FoxLogo.png" width="140" alt="Fox Turbo Mod"/>
 
-# 🦊 Fox Turbo Mod
+# 🦊 Fox Turbo Mod v2.0
 
 **Windows için açık kaynak, ücretsiz oyun performans yöneticisi.**
 
-Arka plan süreçlerini askıya alır · Gerçek FPS ölçer · Discord erişim sorunlarını çözer · Tek tıkla sistem optimize eder
+Arka plan süreçlerini askıya alır · Oyun-içi overlay · Gerçek CPU/GPU sıcaklık · Tema desteği · DPI bypass
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-purple.svg)](https://dotnet.microsoft.com/)
@@ -15,7 +15,7 @@ Arka plan süreçlerini askıya alır · Gerçek FPS ölçer · Discord erişim 
 [![Downloads](https://img.shields.io/github/downloads/baristilki/foxturbomod/total?color=brightgreen)](https://github.com/baristilki/foxturbomod/releases)
 [![Stars](https://img.shields.io/github/stars/baristilki/foxturbomod?style=social)](https://github.com/baristilki/foxturbomod/stargazers)
 
-### [📥 İndir](https://github.com/baristilki/foxturbomod/releases/latest) · [💬 Discord](https://discord.com/users/peacefox) · [🐛 Sorun Bildir](https://github.com/baristilki/foxturbomod/issues) · [⭐ Star Ver](https://github.com/baristilki/foxturbomod)
+### [📥 İndir](https://github.com/baristilki/foxturbomod/releases/latest) · [💬 Discord](https://discord.com/users/peacefox) · [🐛 Sorun Bildir](https://github.com/baristilki/foxturbomod/issues) · [⭐ Star](https://github.com/baristilki/foxturbomod)
 
 </div>
 
@@ -23,19 +23,20 @@ Arka plan süreçlerini askıya alır · Gerçek FPS ölçer · Discord erişim 
 
 ## 🎯 30 Saniyede Özet
 
-Oyun açtığında otomatik devreye girer ve **10+ Windows optimizasyonunu** aynı anda uygular:
+Oyun açtığında otomatik devreye girer ve **14+ Windows optimizasyonunu** aynı anda uygular:
 
 ```
-🧊 Arka plan süreçlerini askıya alır (kill etmez!)    🛑 Gereksiz Windows servislerini durdurur
-🧠 Standby RAM cache'ini temizler (1-3 GB serbest)   ⚡ Yüksek Performans güç planı
-🎬 Game DVR / Xbox Game Bar kapatır                  🚀 Oyun sürecine yüksek öncelik
-🎨 Görsel efektleri minimize eder                    🔧 CPU core parking off
-🎯 MMCSS gaming priority                             🖱 Mouse acceleration off
+🧊 Arka plan süreç askıya alma    🛑 Gereksiz Windows servisleri durdurma
+🧠 Standby RAM cache temizleme    ⚡ Yüksek Performans güç planı
+🎬 Game DVR / Xbox Game Bar off   🚀 Oyun sürecine yüksek öncelik
+🎨 Görsel efektleri minimize      🔧 CPU core parking off
+🎯 MMCSS gaming priority          🖱 Mouse acceleration off
+🌐 Network QoS + DNS flush        💾 Memory standby purge
 ```
 
 Oyun kapanınca **her şey otomatik geri alınır**. Cheat değildir, donanımı verimli kullandırır.
 
-**Bonus**: PresentMon ile gerçek FPS ölçer, GoodbyeDPI ile Türkiye'deki Discord engellemesini atlatır, GitHub auto-update ile kendini günceller.
+**v2.0 yeni özellikler**: 📺 Oyun-içi overlay · 🌡 Gerçek CPU/GPU sıcaklık · 🎨 3 tema (Fox/Cyber/Razer) · 🛡 GoodbyeDPI Discord bypass · 💿 Sürücü tarama · 🧹 TEMP cleaner · ⌨ Hotkey customizer
 
 ## 📊 Gerçek Etki
 
@@ -51,76 +52,104 @@ Oyun kapanınca **her şey otomatik geri alınır**. Cheat değildir, donanımı
 ## ✨ Tüm Özellikler
 
 ### 🚀 Performans Optimizasyonları (otomatik, oyun açılınca)
-- 🧊 **Süreç askıya alma** — 30+ tanımlı arka plan uygulamasını dondurur (OneDrive, Spotify, Chrome sekmeleri, Adobe, Slack, Teams...)
-- 🛑 **Servis durdurma** — Windows Search, SysMain, DiagTrack, MapsBroker, W32Time + 5 güvenli servis
-- 🧠 **Standby memory cache temizleme** — `NtSetSystemInformation` ile 1-3 GB ekstra RAM
-- ⚡ **Güç planı yüksek performans** — `powercfg /setactive`
+- 🧊 **30+ arka plan uygulamasını askıya al** (OneDrive, Spotify, Chrome, Adobe, Slack, Teams)
+- 🛑 **9 güvenli Windows servisi durdurma** (WSearch, SysMain, DiagTrack, W32Time, MapsBroker)
+- 🧠 **Standby memory cache temizleme** (1-3 GB ekstra RAM)
+- ⚡ **Yüksek Performans güç planı** (otomatik geçiş + geri yükleme)
 - 🎬 **Game DVR / Xbox Game Bar otomatik kapatma**
 - 🚀 **Oyun sürecine `ProcessPriorityClass.High`**
-- 🎨 **Görsel efekt minimize** — `VisualFXSetting=2`
-- 🔧 **CPU core parking off** — Tüm çekirdekler aktif
-- 🎯 **MMCSS gaming priority** — `SystemResponsiveness=0` + Games task
-- 🖱 **Mouse acceleration off** — Gaming standart
+- 🎨 **Görsel efekt minimize** (Aero efektleri geçici kapat)
+- 🔧 **CPU core parking off** (tüm çekirdekler aktif)
+- 🎯 **MMCSS gaming priority** (multimedia thread öncelik)
+- 🖱 **Mouse acceleration off** (gaming standart 1:1)
 
 ### 📊 Gerçek Zamanlı Analiz
 - 🎯 **PresentMon (Intel/Microsoft)** ile gerçek FPS ölçümü — ETW tabanlı, en doğru
-- 📈 **Baseline ↔ Aktif FPS karşılaştırması** — "%17 kazandın" değil "87 FPS → 102 FPS (+17.2%)" net sayı
-- 📊 **Seans geçmişi** — Her oyun seansı kaydedilir, haftalık özet ("12 oyun • +14% ort. FPS • 8.3 GB serbest")
+- 🌡 **LibreHardwareMonitor** — gerçek CPU/GPU sıcaklık, kullanım, RAM
+- 📈 **Baseline ↔ Aktif FPS karşılaştırması** — "87 → 102 FPS (+17%)"
+- 📊 **Seans geçmişi** — Her oyun seansı kaydedilir, haftalık özet
+- 💥 **Resource hogs canlı listesi** — En çok RAM yiyen 10 process
+
+### 📺 Oyun-içi Overlay (YENİ — v2.0)
+- **Yatay/Dikey/Kare** yerleşim
+- **FPS, CPU°, GPU°, RAM** canlı göstergeleri
+- **Click-through** mode — mouse oyuna geçer
+- **Mouse ile sürüklenebilir** — istediğin konuma taşı, kaydedilir
+- **Kilit toggle** (🔓/🔒) + ✕ kapat butonu
+- **Hotkey**: Ctrl+Alt+O (aç/kapat), Ctrl+Alt+L (kilit)
+- **Yeşil Turbo indicator** — aktif olduğunda yeşil glow dot
+
+### 🎨 3 Tema (YENİ — v2.0)
+- 🦊 **Fox** — turuncu, sıcak (varsayılan)
+- ⚡ **Cyber** — neon mavi, futurik
+- 🎮 **Razer** — neon yeşil, klasik gaming
+- **Runtime değişim** — Settings'ten anında
 
 ### 🦊 Akıllı Oyun Tespiti
-- **50+ oyun** otomatik tespit: Valorant, LoL, CS2, CoD, Delta Force, BF 2042, Apex, GTA V, EFT, Cyberpunk, Elden Ring, Helldivers 2, Marvel Rivals, Palworld...
-- WMI `__InstanceCreationEvent` ile **uzun process adları** tam destekli (DeltaForceClient-Win64-Shipping.exe gibi)
-- Steam / Epic / Riot kütüphanelerini otomatik tara, oyunları **ikonlarıyla** listele
-- Listeden bir oyuna tıkla → **direkt başlat**
+- **50+ oyun**: Valorant, LoL, CS2, CoD, Delta Force, Battlefield 2042, Apex, GTA V, EFT, Cyberpunk, Elden Ring, Helldivers 2, Palworld
+- WMI `__InstanceCreationEvent` — uzun process adları desteklenir
+- Steam / Epic / Riot kütüphane tarama, oyun ikonlarıyla listele
+- Listeden bir oyuna tıkla → direkt başlat
 
 ### 🚀 Sistem Önerileri Penceresi
 Tek tıkla **direkt aksiyon** butonları:
 - 🛑 **VBS / Bellek Bütünlüğü kapat** — %5-15 FPS (Ryzen)
 - ⚠ **Hipervizor kapat** — %3-8 FPS (Hyper-V / WSL2 / Docker)
-- 🌐 **DNS Cloudflare 1.1.1.1** + Discord aç (DNS-bazlı engelleme için)
-- 🛡 **GoodbyeDPI DPI Bypass** + Discord aç (TLS SNI engelleme için — Türkiye)
+- 🌐 **DNS Cloudflare 1.1.1.1** + Discord aç
+- 🛡 **GoodbyeDPI DPI Bypass** + Discord aç (Türkiye)
 - 💬 **Discord'u kapat** (overlay'i durdurmak için)
 - 🎯 **NVIDIA Overlay'i kapat**
 - 🧹 **Shader cache temizle** (D3D/NVIDIA/AMD)
+- 💿 **Sürücü tarama** (GPU/Ses/Ağ/Chipset, eski sürücüleri tespit)
+- 🧹 **Windows TEMP klasörlerini temizle** (1+ GB tipik)
 - 📱 **Background Store uygulamalarını kapat**
 - 📡 **Telemetri görevlerini devre dışı bırak**
-- 🎮 **NVIDIA Control Panel direkt aç**
+
+### ⌨ Hotkey Customizer (YENİ — v2.0)
+- 🚀 **Turbo Toggle** (varsayılan: Ctrl+Alt+T)
+- 📺 **Overlay Toggle** (Ctrl+Alt+O)
+- 🔓 **Overlay Kilit** (Ctrl+Alt+L)
+- Settings'te "Düzenle" → tuş yakalama dialog → kaydedildi
 
 ### 🛡 Güvenli Tasarım
-- **Asla kill, sadece suspend** — Process kaybı yok, veri kaybı yok
-- **Beyaz liste agresif**: Discord, OBS, antivirüs, sistem süreçleri **dokunulmaz**
-- **PID snapshot**: Sadece *bizim* askıya aldıklarımızı resume ederiz
-- **Servis snapshot+restore**: Zaten kapalıysa açmayız
-- **SafetyNet**: Uygulama çökerse bir sonraki açılışta otomatik kurtarma
-- **Beyaz liste düzenleyici** UI — Hangi süreçlere dokunulmasın özelleştir
+- **Asla kill, sadece suspend** — Process kaybı yok
+- **Beyaz liste agresif**: Discord, OBS, antivirüs, sistem süreçleri dokunulmaz
+- **PID snapshot** — Sadece *bizim* askıya aldıklarımızı resume ederiz
+- **Servis snapshot+restore** — Zaten kapalıysa açmayız
+- **SafetyNet** — Uygulama çökerse otomatik kurtarma
+- **Beyaz liste düzenleyici** UI
 
 ### 🔄 Otomatik Güncelleme
 - Açılışta GitHub Releases sorgulanır
-- Yeni sürüm varsa logonun yanında "v1.X.X mevcut — Güncelle ↗" linki çıkar
-- **Tek tıkla otomatik indir + kur + yeniden başlat** — manuel indirme yok
+- Yeni sürüm varsa banner çıkar
+- **Tek tıkla otomatik indir + kur + yeniden başlat**
 
 ### 🎮 Kullanıcı Deneyimi
-- 📍 **Tepsi ikonu + arka plan modu** — Pencere kapanınca tepsiye iner
-- 🚪 **Akıllı kapatma diyaloğu** — "Tepside Tut" / "Tamamen Çık" + "Bir daha sorma"
-- 🔒 **Tek instance kilidi** — Aynı anda 2 kez açılamaz
-- ⏱ **Uptime göstergesi** — Uygulamanın ne kadar süredir açık olduğunu gösterir
-- 🛡 **Sistem durumu paneli** — HAGS, DirectStorage, VBS, Hipervizor, Windows sürümü gerçek zamanlı
+- 📍 **Tepsi ikonu + arka plan modu**
+- ⚡ **Windows başlangıcında otomatik başlat** (YENİ — v2.0)
+- 🚪 **Akıllı kapatma diyaloğu** — "Tepside Tut" / "Tamamen Çık"
+- 🔒 **Tek instance kilidi**
+- ⏱ **Uptime göstergesi**
+- 🛡 **Sistem durumu paneli**
+- 👋 **Dinamik onboarding** — Sistemini analiz edip 4 kritik aksiyon önerir (YENİ — v2.0)
+- 💡 **Tema-uyumlu tooltip kartları**
 
 ## 🎮 Anti-Cheat Uyumluluğu
 
 | Oyun / Anti-Cheat | Durum |
 |---|---|
 | **CoD, Battlefield, CS2, Apex, PUBG, EFT, GTA V** | ✅ Sorun yok |
-| **LoL, Dota 2, Overwatch 2, Delta Force (ACE)** | ✅ Sorun yok |
-| **Valorant (Vanguard)** | ⚠ Vanguard çalışırken Fox Turbo Mod penceresini kapatmak önerilir (uygulama tepside arka planda kalmaya devam eder). PresentMon ETW'yi Vanguard "şüpheli telemetri" olarak işaretleyebilir. **Ban vermez.** GoodbyeDPI aktifse mutlaka önce kapat. |
+| **LoL, Dota 2, Overwatch 2, Delta Force (ACE)** | ✅ Sorun yok (düşük risk) |
+| **Valorant (Vanguard)** | ⚠ Vanguard çalışırken Fox penceresini kapatmak önerilir (uygulama tepside arka planda kalır). PresentMon ETW + LibreHardwareMonitor kernel driver Vanguard'da uyarı verebilir. **Ban vermez.** |
 
 ## 📥 Kurulum
 
-### En kolay yol (önerilen)
-1. [**Releases**](https://github.com/baristilki/foxturbomod/releases/latest) sayfasından `FoxTurboMod.exe`'yi indir
-2. Çift tıkla → Windows SmartScreen "**Daha fazla bilgi**" → "**Yine de çalıştır**"
-3. UAC penceresinde **"Evet"** (servis yönetimi için yönetici yetkisi şart)
-4. Bir oyun aç → Fox Turbo Mod otomatik devreye girer
+### En kolay yol
+1. [**Releases**](https://github.com/baristilki/foxturbomod/releases/latest) sayfasından `FoxTurboMod.exe` indir
+2. Çift tıkla → SmartScreen "Daha fazla bilgi" → "Yine de çalıştır"
+3. UAC penceresinde **"Evet"** (yönetici yetkisi şart)
+4. Onboarding turu açılır → 4 dinamik öneri ile sistem optimize edilir
+5. Oyun aç → Fox otomatik devreye girer
 
 ### Kaynak koddan derleme
 ```bash
@@ -133,157 +162,95 @@ dotnet publish TurboMode/TurboMode.csproj -c Release -r win-x64 `
   -p:EnableCompressionInSingleFile=true
 ```
 
-Çıktı: `bin/Release/net8.0-windows/win-x64/publish/FoxTurboMod.exe`
-
 ## 🛠 Gereksinimler
 - **Windows 10 / 11** (64-bit)
 - **Yönetici yetkisi** (servis yönetimi için zorunlu)
 - ~150 MB disk
-- **.NET 8 runtime kurulu olmasına GEREK YOK** — gömülü (self-contained build)
+- **.NET 8 runtime kurulu olmasına GEREK YOK** — gömülü
 
-## ❓ SSS (Sıkça Sorulan Sorular)
+## ❓ SSS
 
 <details>
 <summary><b>Bu cheat mi? Ban yer miyim?</b></summary>
 
-Hayır. Fox Turbo Mod **donanım kimliğine, oyuna veya anti-cheat sürücülere dokunmaz**. Sadece Windows'un kullanıcı seviyesindeki yönetilebilir kaynaklarını oyun için yeniden organize eder — bu, Razer Cortex / Process Lasso / Game Mode'un yaptığıyla aynı şey. Anti-cheat'lerle uyumludur (Vanguard hariç — PresentMon yüzünden uyarı çıkabilir, ban yok).
+Hayır. Fox Turbo Mod **donanım kimliğine, oyuna veya anti-cheat sürücülere dokunmaz**. Sadece Windows'un kullanıcı seviyesindeki kaynaklarını oyun için yeniden organize eder. Razer Cortex / Process Lasso / Game Mode'un yaptığıyla aynı şey. **Vanguard hariç** tüm AC'lerle uyumlu.
 </details>
 
 <details>
-<summary><b>PC'me kalıcı zarar verir mi?</b></summary>
+<summary><b>Overlay neden görünmüyor?</b></summary>
 
-Hayır. Her optimizasyon **snapshot + restore** mantığıyla çalışır. Oyun kapanınca tüm değişiklikler eski haline döner. Uygulama çökse bile SafetyNet sistemi bir sonraki açılışta donmuş süreçleri kurtarır.
-</details>
-
-<details>
-<summary><b>Windows SmartScreen / Chrome neden uyarı veriyor?</b></summary>
-
-Code signing sertifikamız henüz yok (~$200/yıl). Bu yüzden yeni + imzasız exe için tüm yeni yazılımlar gibi uyarı çıkar. "Daha fazla bilgi" → "Yine de çalıştır" deyince geçer. Açık kaynak olduğu için kodun her satırı incelenebilir.
+Oyun **Exclusive Fullscreen** mode'daysa hiçbir overlay üstüne çıkmaz. Çözüm: oyun ayarlarında **Borderless Windowed** veya **Windowed Fullscreen** mode'a al. Modern oyunlarda FPS farkı yok.
 </details>
 
 <details>
 <summary><b>Discord açılmıyor — Türkiye'de yasaklı?</b></summary>
 
-**"🚀 Öneriler"** penceresinde 2 çözüm:
+**🚀 Öneriler** penceresinde 2 çözüm:
 - **Adım 1**: Cloudflare DNS'e geç (DNS-bazlı engelleme için)
-- **Adım 2**: GoodbyeDPI bypass (TLS SNI/DPI engelleme için — Türkiye için standart çözüm)
+- **Adım 2**: GoodbyeDPI bypass (TLS SNI/DPI engelleme için)
 
-Her ikisi de yetmezse VPN gerek (uygulamamızın yapamayacağı).
+Her ikisi de yetmezse VPN gerek.
 </details>
 
 <details>
-<summary><b>FPS gerçekten %15-30 mu artıyor?</b></summary>
+<summary><b>FPS ölçüm yanlış değer veriyor</b></summary>
 
-Bağlama göre değişir. 16 GB RAM'li dağınık masaüstünde (50+ Chrome sekmesi, OneDrive, Adobe arka planda) net %15-30 var. 64 GB RAM'li temiz makinede %0-3. PresentMon ile sen kendin gerçek sayıları görürsün — "Baseline 87 FPS → Aktif 102 FPS (+17.2%)" gibi.
+PresentMon **maç içindeki** frame'leri ölçer. Oyun menüsünde veya lobide FPS düşer — bu normal. Maça gir, 30 saniye bekle, gerçek değer akmaya başlar.
 </details>
 
 <details>
-<summary><b>Geçmiş veriler nerede saklanıyor?</b></summary>
+<summary><b>Geçmiş veriler nerede?</b></summary>
 
 `%LOCALAPPDATA%\FoxMod\` klasöründe:
-- `settings.json` — kullanıcı ayarları + beyaz liste
-- `history.json` — son 200 oyun seansı (FPS, RAM, süre)
+- `settings.json` — ayarlar
+- `history.json` — son 200 seans
+- `logs\foxmod-*.log` — günlük log
 
-Hiçbir veri internete gönderilmez. Tamamen yerel, offline çalışır.
-</details>
-
-<details>
-<summary><b>Microsoft Family Safety beni engelliyor</b></summary>
-
-Aile yöneticisi hesabından `account.microsoft.com/family` → uygulama için izin verilebilir. Ya da kalıcı çözüm: code signing sertifikası alınınca otomatik tanınır.
+Hiçbir veri internete gönderilmez.
 </details>
 
 ## 🏗 Mimari
 
 <details>
-<summary>Klasör yapısı (genişletmek için tıkla)</summary>
+<summary>Klasör yapısı</summary>
 
 ```
 TurboMode/
-├── Services/
-│   ├── TurboCoordinator.cs              # Tüm optimizer'ları koordine eder
-│   ├── ProcessOptimizer.cs              # NtSuspendProcess / NtResumeProcess
-│   ├── ServiceOptimizer.cs              # Windows servisleri snapshot+restore
-│   ├── MemoryOptimizer.cs               # NtSetSystemInformation cache temizle
-│   ├── PowerPlanOptimizer.cs            # powercfg /setactive
-│   ├── NetworkOptimizer.cs              # QoS policy + DNS flush
-│   ├── GameDvrOptimizer.cs              # Game Bar registry tweaks
-│   ├── ProcessPriorityOptimizer.cs      # Process priority class
-│   ├── VisualEffectsOptimizer.cs        # VisualFXSetting registry
-│   ├── CpuParkingOptimizer.cs           # powercfg CPMINCORES
-│   ├── SystemResponsivenessOptimizer.cs # MMCSS gaming priority
-│   ├── MouseOptimizer.cs                # Mouse acceleration off
-│   ├── FpsMonitor.cs                    # PresentMon stdout parse
-│   ├── GameDetector.cs                  # WMI __InstanceCreationEvent
-│   ├── GameLibraryScanner.cs            # Steam VDF + Epic JSON + Riot
-│   ├── SessionHistoryStore.cs           # JSON-backed history
-│   ├── SystemStateChecker.cs            # HAGS/VBS/Hypervisor/Discord/GFE durumu
-│   ├── RecommendationsService.cs        # Sistem analizi & öneri üretimi
-│   ├── VbsToggler.cs                    # VBS/HVCI registry kapatma
-│   ├── HypervisorToggler.cs             # bcdedit hypervisorlaunchtype
-│   ├── OverlayDisabler.cs               # Discord + NVIDIA overlay kapatma
-│   ├── DnsOptimizer.cs                  # Cloudflare DNS + Discord launcher
-│   ├── DpiBypass.cs                     # GoodbyeDPI entegrasyonu
-│   ├── WindowsTweaks.cs                 # Background apps + telemetry tasks
-│   ├── ShaderCacheCleaner.cs            # D3D/NVIDIA/AMD cache
-│   ├── UpdateChecker.cs                 # GitHub Releases API
-│   ├── AutoUpdater.cs                   # Self-replace + restart
-│   ├── TrayIconHost.cs                  # WinForms NotifyIcon
-│   └── SafetyNet.cs                     # Çökme kurtarma
-├── Native/
-│   ├── NativeMethods.cs                 # OpenProcess, NtSuspend...
-│   ├── NtApi.cs                         # Memory list API
-│   ├── IconExtractor.cs                 # SHGetFileInfo
-│   └── UserInterop.cs                   # SetForegroundWindow
-├── ViewModels/
-│   └── MainViewModel.cs
-├── Views/
-│   ├── HistoryWindow.xaml               # Seans geçmişi
-│   ├── WhitelistWindow.xaml             # Beyaz liste yöneticisi
-│   ├── RecommendationsWindow.xaml       # Sistem önerileri
-│   ├── UpdateWindow.xaml                # Otomatik güncelleme
-│   └── CloseDialog.xaml                 # Tepside/Çık dialog
-├── Resources/
-│   ├── FoxMod.ico                       # Uygulama ikonu
-│   ├── FoxLogo.png                      # 2400x2400 logo
-│   ├── default_game.png                 # Yedek oyun ikonu
-│   ├── PresentMon.exe                   # Intel/Microsoft, MIT - gömülü
-│   └── GoodbyeDPI/                      # ValdikSS, MIT - gömülü
-│       ├── goodbyedpi.exe
-│       ├── WinDivert.dll
-│       └── WinDivert64.sys
+├── Services/           # 25+ optimizer + servis
+├── Native/             # Win32 P/Invoke
+├── ViewModels/         # MVVM
+├── Views/              # 10+ pencere
+├── Themes/             # 3 tema XAML
+├── Resources/          # logo, ikon, gömülü PresentMon + GoodbyeDPI
 └── MainWindow.xaml
 ```
+
+Detaylı dosya listesi için [Wiki](https://github.com/baristilki/foxturbomod/wiki) sayfasını oluşturduğumuzda eklenecek.
 </details>
 
 ## 🗺 Yol Haritası
 
-### v1.5.x (mevcut)
-- [x] PresentMon ile gerçek FPS karşılaştırması
-- [x] Otomatik güncelleme (GitHub Releases)
-- [x] Sistem Önerileri penceresi
-- [x] VBS/HVCI/Hipervizor tek-tık kapatma
-- [x] Discord + NVIDIA Overlay kapatma
-- [x] Cloudflare DNS optimizasyonu
-- [x] GoodbyeDPI DPI bypass (Türkiye Discord erişimi)
-- [x] Shader cache temizleme
-- [x] Background apps & telemetry tasks
-- [x] MMCSS gaming priority + Mouse acceleration off
+### v2.0 (mevcut) ✅
+- [x] 3 tema runtime değişim
+- [x] Oyun-içi overlay
+- [x] CPU/GPU sıcaklık (LibreHardwareMonitor)
+- [x] Hotkey customizer
+- [x] Dinamik onboarding 4 kart
+- [x] Driver tarama, TEMP cleaner
+- [x] Windows başlangıcında otomatik aç
 
-### v1.6.x (sıradaki — planlanan)
-- [ ] **Settings penceresi** — Tüm feature toggle'lar görünür kontrol
-- [ ] **Multilingual** (İngilizce / Almanca)
-- [ ] **Hotkey desteği** — `Ctrl+Alt+T` ile her yerden Turbo aç/kapa
-- [ ] **Real-time FPS overlay (HUD)** — Oyun içinde sol üstte FPS
+### v2.1.x (sıradaki — planlanan)
+- [ ] **Anti-cheat auto-detect** — Vanguard/ACE'de overlay otomatik kapat
+- [ ] **Multilingual** (TR/EN/DE)
+- [ ] **FPS spike tespiti** — overlay'de canlı frame time grafiği
+- [ ] **Per-game profil UI** — oyun başına özel ayar
+- [ ] **Crash log reader** — Windows Event Viewer'dan
 
-### v2.0.x (uzun vadeli)
-- [ ] **Profil sistemi UI** — Oyun başına özel ayar
-- [ ] **Steam header görselleri** — Oyun kartlarında banner
-- [ ] **Onboarding turu** — İlk açılış 3 ekran
-- [ ] **Code signing sertifikası** — SmartScreen uyarıları kalkar
-- [ ] **Plugin sistemi** — Kullanıcı kendi optimizasyon eklesin
+### v3.0 (uzun vadeli)
+- [ ] **Code signing sertifikası** — SmartScreen uyarısı kalkar
+- [ ] **Plugin sistemi** — kullanıcı kendi optimizasyon eklesin
 - [ ] **Cloud sync** (GitHub Gist)
-- [ ] **Web dashboard** — Geçmiş seans analizi
+- [ ] **Web dashboard** — seans analizi
 
 ## 🤝 Katkı
 
@@ -295,40 +262,36 @@ Pull request'ler, issue'lar ve fikirler hoş karşılanır.
 4. Push: `git push origin feature/awesome`
 5. Pull Request aç
 
-İlk katkıların için: README'deki yazım hataları, çevirisi eksik metinler, mimari diyagramdaki yanlışlıklar — küçük ama değerli.
-
 ## 💬 Destek
-
-- **💬 Discord**: `peacefox` ([direkt mesaj at](https://discord.com/users/peacefox))
-- **🐛 GitHub Issues**: [Sorun bildir / özellik öner](https://github.com/baristilki/foxturbomod/issues)
-- **⭐ Beğendiyseniz**: Sağ üstte **Star** vermeyi unutmayın — projenin görünürlüğü için kritik
+- **💬 Discord**: `peacefox`
+- **🐛 GitHub Issues**: [Sorun bildir](https://github.com/baristilki/foxturbomod/issues)
+- **⭐ Beğendiyseniz**: Star verin — görünürlük için kritik
 
 ## 📜 Lisans
-
-**MIT License** — Detay için [LICENSE](LICENSE). Kullanım, modifikasyon, dağıtım serbest. Ticari kullanım dahil.
+**MIT** — [LICENSE](LICENSE). Kullanım, modifikasyon, dağıtım serbest.
 
 ## 🙏 Üçüncü Taraf
 
-| Bileşen | Lisans | Geliştirici | Kullanım |
-|---|---|---|---|
-| [PresentMon](https://github.com/GameTechDev/PresentMon) | MIT | Intel / Microsoft | FPS ölçümü (ETW) |
-| [GoodbyeDPI](https://github.com/ValdikSS/GoodbyeDPI) | Apache 2.0 | ValdikSS | TLS DPI bypass |
-| [WinDivert](https://github.com/basil00/WinDivert) | LGPL | basil00 | WFP packet capture |
-| [ModernWpfUI](https://github.com/Kinnara/ModernWpf) | MIT | Kinnara | UI temalama |
-| [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) | MIT | Microsoft | MVVM altyapı |
-| [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) | MIT | Microsoft | İkon kaynak |
+| Bileşen | Lisans | Geliştirici |
+|---|---|---|
+| [PresentMon](https://github.com/GameTechDev/PresentMon) | MIT | Intel / Microsoft |
+| [GoodbyeDPI](https://github.com/ValdikSS/GoodbyeDPI) | Apache 2.0 | ValdikSS |
+| [WinDivert](https://github.com/basil00/WinDivert) | LGPL | basil00 |
+| [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) | MPL 2.0 | LibreHardwareMonitor |
+| [ModernWpfUI](https://github.com/Kinnara/ModernWpf) | MIT | Kinnara |
+| [CommunityToolkit.Mvvm](https://github.com/CommunityToolkit/dotnet) | MIT | Microsoft |
+| [Microsoft Fluent Emoji](https://github.com/microsoft/fluentui-emoji) | MIT | Microsoft |
+| [SuperTinyIcons](https://github.com/edent/SuperTinyIcons) | MIT | edent |
 
 ## 📈 Sürüm Geçmişi
 
-- **v1.5.0** — GoodbyeDPI entegrasyonu, Discord DPI bypass
-- **v1.4.0** — DNS optimizasyonu (Cloudflare 1.1.1.1)
-- **v1.3.1** — CoD latency fix, "Donduruldu" detay listesi, Mouse accel off, W32Time
-- **v1.3.0** — Sistem Önerileri penceresi, VBS/Hipervizor kapatma, Shader cache temizleme
-- **v1.2.x** — Otomatik güncelleme, tek instance kilidi, kapat dialog, GitHub entegrasyonu
-- **v1.1.x** — Yüklü oyun kütüphane taraması, FPS karşılaştırma paneli, Tepsi ikonu
-- **v1.0.0** — İlk kararlı sürüm, Razer Cortex alternatifi olarak yola çıkış
-
-Tam changelog: [Releases](https://github.com/baristilki/foxturbomod/releases)
+- **v2.0.0** — Overlay, 3 tema, CPU/GPU sıcaklık (LibreHardwareMonitor), hotkey customizer, dinamik onboarding, auto-start, driver tarama, TEMP cleaner, Settings penceresi
+- **v1.5.0** — GoodbyeDPI DPI bypass
+- **v1.4.0** — DNS optimizasyonu
+- **v1.3.x** — Sistem önerileri, VBS/Hipervizor kapatma
+- **v1.2.x** — Otomatik güncelleme, tek instance, GitHub entegrasyonu
+- **v1.1.x** — Kütüphane tarama, FPS karşılaştırma, tepsi
+- **v1.0.0** — İlk sürüm
 
 ---
 

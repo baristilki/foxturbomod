@@ -28,6 +28,36 @@ public partial class RecommendationsWindow : Window
         RecList.ItemsSource = items.Select(r => new RecVm(r)).ToList();
     }
 
+    private async Task ProbeBackground()
+    {
+        // Network ping ölçümü
+        try
+        {
+            var pings = await NetworkProbe.ProbeAsync();
+            var summary = string.Join("  •  ",
+                pings.Select(p => p.Success ? $"{p.Target}: {p.PingMs}ms" : $"{p.Target}: ✗"));
+            RecommendationsServiceHelpers.LastNetworkSummary = summary;
+        }
+        catch (Exception ex) { Log.Error(ex, "Network probe hatası"); }
+
+        // Driver bilgileri
+        try
+        {
+            var drivers = await Task.Run(() => DriverChecker.Check());
+            if (drivers.Count > 0)
+            {
+                var sum = string.Join("  •  ",
+                    drivers.Select(d => $"{d.Vendor} {d.Version}"));
+                RecommendationsServiceHelpers.LastDriverSummary = sum;
+            }
+            else RecommendationsServiceHelpers.LastDriverSummary = "Sürücü bulunamadı";
+        }
+        catch (Exception ex) { Log.Error(ex, "Driver check hatası"); }
+
+        // Listeyi tazele
+        Dispatcher.Invoke(Load);
+    }
+
     private void Action_Click(object sender, RoutedEventArgs e)
     {
         if (sender is not FrameworkElement fe || fe.Tag is not Recommendation r) return;
@@ -165,35 +195,43 @@ public partial class RecommendationsWindow : Window
                     break;
                 }
 
+            case "clean-temp":
+                {
+                    var rr = WindowsTweaks.CleanTempFolders();
+                    if (rr.Success) Info(rr.Message, "TEMP Temizlendi"); else Error(rr.Message);
+                    break;
+                }
+
             case "dpi-stop":
                 {
                     var rr = _dpi.Stop();
                     Info(rr.Message, "GoodbyeDPI");
                     break;
                 }
+
+            case "open-driver-scan":
+                {
+                    try
+                    {
+                        var win = new DriverScanWindow { Owner = this };
+                        win.ShowDialog();
+                    }
+                    catch (Exception ex) { Error(ex.Message); }
+                    break;
+                }
         }
     }
 
-    private static bool Confirm(string text, string title)
+    private bool Confirm(string text, string title) => FoxDialog.Confirm(this, title, text);
+    private void Info(string text, string title) => FoxDialog.Info(this, title, text);
+    private void Error(string text) => FoxDialog.Error(this, "Fox Turbo Mod", text);
+
+    private void AskReboot(string message)
     {
-        var r = System.Windows.MessageBox.Show(text, title,
-            MessageBoxButton.YesNo, MessageBoxImage.Warning);
-        return r == MessageBoxResult.Yes;
-    }
-
-    private static void Info(string text, string title) =>
-        System.Windows.MessageBox.Show(text, title, MessageBoxButton.OK, MessageBoxImage.Information);
-
-    private static void Error(string text) =>
-        System.Windows.MessageBox.Show(text, "Fox Turbo Mod", MessageBoxButton.OK, MessageBoxImage.Error);
-
-    private static void AskReboot(string message)
-    {
-        var r = System.Windows.MessageBox.Show(
+        var r = FoxDialog.Show(this, "Yeniden Başlatma Gerek",
             message + "\n\nŞimdi yeniden başlatmak ister misin?",
-            "Yeniden Başlatma Gerek",
-            MessageBoxButton.YesNo, MessageBoxImage.Question);
-        if (r == MessageBoxResult.Yes)
+            FoxDialog.DialogKind.Confirm, "Sonra", "Şimdi Başlat");
+        if (r == "Şimdi Başlat")
         {
             try
             {

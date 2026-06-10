@@ -3,303 +3,462 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:ui="http://schemas.modernwpf.com/2019"
         xmlns:vm="clr-namespace:TurboMode.ViewModels"
+        xmlns:views="clr-namespace:TurboMode.Views"
         ui:WindowHelper.UseModernWindowStyle="True"
-        Title="Fox Turbo Mod" Height="940" Width="560"
+        Title="Fox Turbo Mod" Height="810" Width="560"
         ResizeMode="CanMinimize"
         WindowStartupLocation="CenterScreen"
-        Background="#0E0E13"
-        Icon="/Resources/FoxMod.ico">
+        Background="{DynamicResource WindowBackground}"
+        Icon="/Resources/FoxMod.ico"
+        ToolTipService.InitialShowDelay="300"
+        ToolTipService.ShowDuration="20000">
 
     <Window.DataContext>
         <vm:MainViewModel />
     </Window.DataContext>
 
-    <Grid Margin="22,14,22,16">
+    <Grid Margin="16,12,16,12">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />   <!-- Başlık -->
-            <RowDefinition Height="Auto" />   <!-- Buton bar -->
+            <RowDefinition Height="Auto" />   <!-- Header -->
             <RowDefinition Height="Auto" />   <!-- Hakkında -->
-            <RowDefinition Height="Auto" />   <!-- Toggle paneli -->
-            <RowDefinition Height="Auto" />   <!-- Sonuç -->
-            <RowDefinition Height="Auto" />   <!-- FPS -->
-            <RowDefinition Height="Auto" />   <!-- Aktif oyun + Haftalık özet -->
-            <RowDefinition Height="Auto" />   <!-- Metrikler -->
+            <RowDefinition Height="Auto" />   <!-- Stat tile'lar (CPU/GPU/RAM/FPS) -->
+            <RowDefinition Height="Auto" />   <!-- Toggle + Sonuç + FPS panel -->
+            <RowDefinition Height="Auto" />   <!-- Oyun durumu + Haftalık -->
             <RowDefinition Height="*" />      <!-- Oyun listesi -->
-            <RowDefinition Height="Auto" />   <!-- Discord buton -->
+            <RowDefinition Height="Auto" />   <!-- Discord/GitHub -->
+            <RowDefinition Height="Auto" />   <!-- Network ping -->
             <RowDefinition Height="Auto" />   <!-- Footer -->
         </Grid.RowDefinitions>
 
-        <!-- Başlık (logo + isim + version chip + uptime chip) -->
-        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,8">
-            <Image Source="/Resources/FoxLogo.png" Width="40" Height="40" Margin="0,0,12,0" />
-            <StackPanel VerticalAlignment="Center">
-                <TextBlock Text="FOX TURBO MOD" FontSize="20" FontWeight="Bold"
-                           Foreground="{StaticResource TextPrimary}" />
-                <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                    <!-- Version chip -->
-                    <Border Background="#1F1F28" CornerRadius="10" Padding="8,2">
-                        <TextBlock Text="{Binding VersionLabel}" FontSize="10"
-                                   Foreground="{StaticResource TextSecondary}" />
-                    </Border>
-                    <!-- Uptime chip -->
-                    <Border Background="#2A1F14" CornerRadius="10" Padding="8,2" Margin="6,0,0,0">
-                        <TextBlock Text="{Binding UptimeLabel}" FontSize="10"
-                                   Foreground="{StaticResource AccentBrush}" />
-                    </Border>
-                    <!-- Update banner -->
-                    <TextBlock Text="{Binding UpdateBanner}" FontSize="11"
-                               Foreground="{StaticResource AccentBrush}" Margin="8,2,0,0"
-                               VerticalAlignment="Center"
-                               Cursor="Hand" MouseLeftButtonUp="OpenUpdate_Click" />
+        <!-- HEADER: logo + isim + version + butonlar — tek satır -->
+        <Grid Grid.Row="0" Margin="0,0,0,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
+                <Image Source="/Resources/FoxLogo.png" Width="34" Height="34" Margin="0,0,8,0" />
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="FOX TURBO MOD" FontSize="14" FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimary}" />
+                    <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+                        <TextBlock Text="{Binding VersionLabel}" FontSize="9"
+                                   Foreground="{DynamicResource TextSecondary}" />
+                        <TextBlock Text=" • " FontSize="9" Foreground="{DynamicResource TextSecondary}" />
+                        <TextBlock Text="{Binding UptimeLabel}" FontSize="9"
+                                   Foreground="{DynamicResource AccentBrush}" />
+                        <TextBlock Text="{Binding UpdateBanner}" FontSize="9"
+                                   Foreground="{DynamicResource AccentBrush}" Margin="6,0,0,0"
+                                   Cursor="Hand" MouseLeftButtonUp="OpenUpdate_Click" />
+                    </StackPanel>
                 </StackPanel>
             </StackPanel>
-        </StackPanel>
 
-        <!-- Buton bar (alt satır) -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right"
-                    Margin="0,0,0,12">
-            <Button Content="🚀 Öneriler" Cursor="Hand" Click="Recommendations_Click"
-                    Background="#2A1F14" BorderBrush="{StaticResource AccentBrush}"
-                    Foreground="{StaticResource AccentBrush}" Padding="12,5" Margin="0,0,6,0" />
-            <Button Content="📊 Geçmiş" Cursor="Hand" Click="History_Click"
-                    Background="Transparent" BorderBrush="{StaticResource BorderBrushDim}"
-                    Foreground="{StaticResource TextPrimary}" Padding="12,5" Margin="0,0,6,0" />
-            <Button Content="🛡 Beyaz Liste" Cursor="Hand" Click="Whitelist_Click"
-                    Background="Transparent" BorderBrush="{StaticResource BorderBrushDim}"
-                    Foreground="{StaticResource TextPrimary}" Padding="12,5" Margin="0,0,6,0" />
-            <Button Content="ℹ" Cursor="Hand"
-                    Command="{Binding ToggleAboutCommand}"
-                    Background="Transparent" BorderBrush="{StaticResource BorderBrushDim}"
-                    Foreground="{StaticResource TextSecondary}" Padding="10,5" />
-        </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Content="📺" Click="Overlay_Click"
+                        Style="{StaticResource ModernButton}" Margin="0,0,4,0"
+                        Background="{Binding OverlayButtonBg}"
+                        BorderBrush="{Binding OverlayButtonBorder}"
+                        Foreground="{Binding OverlayButtonFg}" FontSize="14">
+                    <Button.ToolTip>
+                        <ToolTip Placement="Bottom" HorizontalOffset="-20" VerticalOffset="6">
+                            <Border CornerRadius="8" Padding="12,10" MaxWidth="280"
+                                    Background="{DynamicResource PanelBrush}"
+                                    BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="📺 Oyun-içi Overlay" FontWeight="Bold" FontSize="13"
+                                               Foreground="{DynamicResource AccentBrush}" />
+                                    <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,4,0,0"
+                                               Foreground="{DynamicResource TextPrimary}"
+                                               Text="FPS, CPU/GPU sıcaklık, RAM canlı göstergesi. Oyun-içinde her zaman üstte." />
+                                    <TextBlock Text="⚠ Borderless Windowed mode'da çalışır" FontSize="10"
+                                               Foreground="#CC9933" Margin="0,4,0,0" />
+                                    <TextBlock Text="Hotkey: Ctrl+Alt+O" FontSize="10"
+                                               Foreground="{DynamicResource TextSecondary}" Margin="0,2,0,0" />
+                                </StackPanel>
+                            </Border>
+                        </ToolTip>
+                    </Button.ToolTip>
+                </Button>
+                <Button Content="🚀" Click="Recommendations_Click"
+                        Style="{StaticResource ModernButton}"
+                        Background="{DynamicResource HighlightPanelChip}"
+                        BorderBrush="{DynamicResource AccentBrush}"
+                        Foreground="{DynamicResource AccentBrush}" Margin="0,0,4,0" FontSize="14">
+                    <Button.ToolTip>
+                        <ToolTip Placement="Bottom" HorizontalOffset="-20" VerticalOffset="6">
+                            <Border CornerRadius="8" Padding="12,10" MaxWidth="280"
+                                    Background="{DynamicResource PanelBrush}"
+                                    BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="🚀 Sistem Önerileri" FontWeight="Bold" FontSize="13"
+                                               Foreground="{DynamicResource AccentBrush}" />
+                                    <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,4,0,0"
+                                               Foreground="{DynamicResource TextPrimary}"
+                                               Text="VBS / Hipervizor kapat • Discord erişim sorunu çöz • Shader cache temizle • Sürücü tarama • TEMP cleaner" />
+                                </StackPanel>
+                            </Border>
+                        </ToolTip>
+                    </Button.ToolTip>
+                </Button>
+                <Button Content="📊" Click="History_Click"
+                        Style="{StaticResource ModernButton}" Margin="0,0,4,0" FontSize="14">
+                    <Button.ToolTip>
+                        <ToolTip Placement="Bottom" HorizontalOffset="-20" VerticalOffset="6">
+                            <Border CornerRadius="8" Padding="12,10" MaxWidth="280"
+                                    Background="{DynamicResource PanelBrush}"
+                                    BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="📊 Geçmiş ve İstatistikler" FontWeight="Bold" FontSize="13"
+                                               Foreground="{DynamicResource AccentBrush}" />
+                                    <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,4,0,0"
+                                               Foreground="{DynamicResource TextPrimary}"
+                                               Text="Son 200 oyun seansı, FPS karşılaştırması, haftalık özet (toplam saat, ort. kazanç)." />
+                                </StackPanel>
+                            </Border>
+                        </ToolTip>
+                    </Button.ToolTip>
+                </Button>
+                <Button Content="💥" Click="Hogs_Click"
+                        Style="{StaticResource ModernButton}" Margin="0,0,4,0" FontSize="14">
+                    <Button.ToolTip>
+                        <ToolTip Placement="Bottom" HorizontalOffset="-20" VerticalOffset="6">
+                            <Border CornerRadius="8" Padding="12,10" MaxWidth="280"
+                                    Background="{DynamicResource PanelBrush}"
+                                    BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="💥 Kaynak Tüketenler" FontWeight="Bold" FontSize="13"
+                                               Foreground="{DynamicResource AccentBrush}" />
+                                    <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,4,0,0"
+                                               Foreground="{DynamicResource TextPrimary}"
+                                               Text="En çok RAM yiyen 10 process — 3 saniyede güncellenir. Korunan / Turbo hedefi olduğu görünür." />
+                                </StackPanel>
+                            </Border>
+                        </ToolTip>
+                    </Button.ToolTip>
+                </Button>
+                <Button Content="🛡" Click="Whitelist_Click"
+                        Style="{StaticResource ModernButton}" Margin="0,0,4,0" FontSize="14">
+                    <Button.ToolTip>
+                        <ToolTip Placement="Bottom" HorizontalOffset="-20" VerticalOffset="6">
+                            <Border CornerRadius="8" Padding="12,10" MaxWidth="280"
+                                    Background="{DynamicResource PanelBrush}"
+                                    BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="🛡 Beyaz Liste" FontWeight="Bold" FontSize="13"
+                                               Foreground="{DynamicResource AccentBrush}" />
+                                    <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,4,0,0"
+                                               Foreground="{DynamicResource TextPrimary}"
+                                               Text="Hangi uygulamalara Turbo dokunmasın özelleştir. Discord/OBS/antivirüs varsayılan korunur." />
+                                </StackPanel>
+                            </Border>
+                        </ToolTip>
+                    </Button.ToolTip>
+                </Button>
+                <Button Content="ℹ" Command="{Binding ToggleAboutCommand}"
+                        Style="{StaticResource ModernButton}" Margin="0,0,4,0" FontSize="14">
+                    <Button.ToolTip>
+                        <ToolTip Placement="Bottom" HorizontalOffset="-20" VerticalOffset="6">
+                            <Border CornerRadius="8" Padding="12,10" MaxWidth="280"
+                                    Background="{DynamicResource PanelBrush}"
+                                    BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="ℹ Hakkında" FontWeight="Bold" FontSize="13"
+                                               Foreground="{DynamicResource AccentBrush}" />
+                                    <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,4,0,0"
+                                               Foreground="{DynamicResource TextPrimary}"
+                                               Text="Fox Turbo Mod nedir, ne yapar, ne yapmaz açıklama panelini aç/kapat." />
+                                </StackPanel>
+                            </Border>
+                        </ToolTip>
+                    </Button.ToolTip>
+                </Button>
+                <Button Content="⚙" Click="Settings_Click"
+                        Style="{StaticResource ModernButton}" FontSize="14">
+                    <Button.ToolTip>
+                        <ToolTip Placement="Bottom" HorizontalOffset="-20" VerticalOffset="6">
+                            <Border CornerRadius="8" Padding="12,10" MaxWidth="280"
+                                    Background="{DynamicResource PanelBrush}"
+                                    BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1">
+                                <StackPanel>
+                                    <TextBlock Text="⚙ Ayarlar" FontWeight="Bold" FontSize="13"
+                                               Foreground="{DynamicResource AccentBrush}" />
+                                    <TextBlock TextWrapping="Wrap" FontSize="11" Margin="0,4,0,0"
+                                               Foreground="{DynamicResource TextPrimary}"
+                                               Text="14 optimizasyon toggle, tema (Fox/Cyber/Razer), overlay görünüm, hotkey customize, gelişmiş." />
+                                </StackPanel>
+                            </Border>
+                        </ToolTip>
+                    </Button.ToolTip>
+                </Button>
+            </StackPanel>
+        </Grid>
 
-        <!-- Hakkında paneli -->
-        <Border Grid.Row="2" Background="{StaticResource PanelBrush}"
-                BorderBrush="{StaticResource AccentBrush}" BorderThickness="1"
-                CornerRadius="10" Padding="18,14" Margin="0,0,0,12"
+        <!-- HAKKINDA paneli -->
+        <Border Grid.Row="1" Style="{StaticResource ModernCard}"
+                Padding="14,10" Margin="0,0,0,10"
                 Visibility="{Binding AboutOpen, Converter={StaticResource BoolToVis}}">
-            <StackPanel>
-                <TextBlock Text="Fox Turbo Mod nedir?" FontWeight="SemiBold" FontSize="14"
-                           Foreground="{StaticResource AccentBrush}" Margin="0,0,0,6" />
-                <TextBlock Foreground="{StaticResource TextPrimary}" TextWrapping="Wrap" FontSize="12" LineHeight="18">
-                    Oyun oynarken arka planda CPU/RAM tüketen uygulamaları
-                    (OneDrive, Spotify, Chrome sekmeleri vb.) ve gereksiz Windows servislerini
-                    geçici olarak <Run FontWeight="SemiBold" Foreground="{StaticResource AccentBrush}">askıya alır</Run>
-                    (kill etmez). Cache temizler, güç planını yüksek performansa geçirir, Game DVR'ı kapatır,
-                    CPU önceliğini yükseltir. Oyun kapanınca her şeyi otomatik geri açar.
-                </TextBlock>
-                <TextBlock Foreground="{StaticResource TextPrimary}" TextWrapping="Wrap"
-                           FontSize="12" LineHeight="18" Margin="0,8,0,0">
-                    <Run FontWeight="SemiBold">Yaptıkları:</Run>
-                    arka plan dondurma • servisleri durdurma • cache temizleme • güç planı •
-                    Game DVR off • CPU priority • görsel efekt minimize • CPU parking off
-                </TextBlock>
-                <TextBlock Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"
-                           FontSize="12" LineHeight="18" Margin="0,6,0,0">
-                    <Run FontWeight="SemiBold">Yapmadıkları:</Run>
-                    cheat değildir • donanım performansı yükseltmez • PC'ye kalıcı zarar vermez •
-                    Discord/OBS/antivirüse dokunmaz
-                </TextBlock>
-            </StackPanel>
+            <TextBlock TextWrapping="Wrap" FontSize="11" LineHeight="17"
+                       Foreground="{DynamicResource TextPrimary}">
+                Oyun açıkken arka plan süreçlerini askıya alır, gereksiz servisleri durdurur,
+                sistem cache'ini temizler. Oyun kapanınca her şey otomatik geri alınır.
+                <Run FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}">Cheat değildir.</Run>
+            </TextBlock>
         </Border>
 
-        <!-- Ana toggle paneli -->
-        <Border Grid.Row="3" Background="{StaticResource PanelBrush}"
-                BorderBrush="{StaticResource BorderBrushDim}" BorderThickness="1"
-                CornerRadius="10" Padding="20,18">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+        <!-- STAT TILE GRID: CPU / GPU / RAM / FPS -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="8" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding StatusTitle}" FontSize="18" FontWeight="SemiBold"
-                               Foreground="{StaticResource TextPrimary}" />
-                    <TextBlock Text="{Binding StatusDetail}" FontSize="12"
-                               Foreground="{StaticResource TextSecondary}" Margin="0,4,0,0"
-                               TextWrapping="Wrap" />
+            <!-- CPU TILE -->
+            <Border Grid.Column="0" Style="{StaticResource ModernCard}" Padding="12,10">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="🔥 CPU" FontSize="10"
+                                   Foreground="{DynamicResource TextSecondary}" />
+                        <TextBlock Grid.Column="1" Text="{Binding CpuTempLabel}" FontSize="14" FontWeight="Bold"
+                                   Foreground="{Binding CpuTempColor}" />
+                    </Grid>
+                    <TextBlock Text="{Binding CpuLabel}" FontSize="18" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimary}" Margin="0,4,0,2" />
+                    <ProgressBar Value="{Binding CpuPercent}" Maximum="100" Height="4"
+                                 Foreground="{DynamicResource AccentBrush}" Background="#2A2A33" />
+                    <TextBlock Text="{Binding CpuName}" FontSize="9" Margin="0,4,0,0"
+                               Foreground="{DynamicResource TextSecondary}"
+                               TextTrimming="CharacterEllipsis" />
                 </StackPanel>
+            </Border>
 
-                <ToggleButton Grid.Column="1" Width="72" Height="38"
-                              IsChecked="{Binding TurboEnabled, Mode=TwoWay}"
-                              VerticalAlignment="Center" Cursor="Hand">
-                    <ToggleButton.Style>
-                        <Style TargetType="ToggleButton">
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="ToggleButton">
-                                        <Border x:Name="Pill" Background="#2A2A33"
-                                                CornerRadius="19" BorderThickness="0">
-                                            <Ellipse x:Name="Knob" Width="30" Height="30" Fill="White"
-                                                     HorizontalAlignment="Left" Margin="4,0,0,0" />
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsChecked" Value="True">
-                                                <Setter TargetName="Pill" Property="Background"
-                                                        Value="{StaticResource AccentBrush}" />
-                                                <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right" />
-                                                <Setter TargetName="Knob" Property="Margin" Value="0,0,4,0" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
-                        </Style>
-                    </ToggleButton.Style>
-                </ToggleButton>
-            </Grid>
-        </Border>
+            <!-- GPU TILE -->
+            <Border Grid.Column="2" Style="{StaticResource ModernCard}" Padding="12,10">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="🎮 GPU" FontSize="10"
+                                   Foreground="{DynamicResource TextSecondary}" />
+                        <TextBlock Grid.Column="1" Text="{Binding GpuTempLabel}" FontSize="14" FontWeight="Bold"
+                                   Foreground="{Binding GpuTempColor}" />
+                    </Grid>
+                    <TextBlock FontSize="18" FontWeight="SemiBold" Margin="0,4,0,2"
+                               Foreground="{DynamicResource TextPrimary}">
+                        <Run Text="%" /><Run Text="{Binding GpuLoad, StringFormat=N0, Mode=OneWay}" />
+                    </TextBlock>
+                    <ProgressBar Value="{Binding GpuLoad}" Maximum="100" Height="4"
+                                 Foreground="{DynamicResource AccentBrush}" Background="#2A2A33" />
+                    <TextBlock Text="{Binding GpuName}" FontSize="9" Margin="0,4,0,0"
+                               Foreground="{DynamicResource TextSecondary}"
+                               TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+            </Border>
 
-        <!-- SONUÇ paneli -->
-        <Border Grid.Row="4" Margin="0,12,0,0" Background="#1A1410"
-                BorderBrush="{StaticResource AccentBrush}" BorderThickness="1"
-                CornerRadius="10" Padding="16,12"
-                Visibility="{Binding ResultPanelVisibility}">
-            <StackPanel>
+            <!-- RAM TILE -->
+            <Border Grid.Column="4" Style="{StaticResource ModernCard}" Padding="12,10">
+                <StackPanel>
+                    <TextBlock Text="💾 RAM" FontSize="10"
+                               Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Text="{Binding RamLabel}" FontSize="14" FontWeight="SemiBold"
+                               Foreground="{DynamicResource TextPrimary}" Margin="0,6,0,4" />
+                    <ProgressBar Value="{Binding RamPercent}" Maximum="100" Height="4"
+                                 Foreground="{DynamicResource AccentBrush}" Background="#2A2A33" />
+                    <TextBlock FontSize="9" Margin="0,4,0,0"
+                               Foreground="{DynamicResource TextSecondary}">
+                        <Run Text="%" /><Run Text="{Binding RamPercent, StringFormat=N0, Mode=OneWay}" />
+                        <Run Text="kullanım" />
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+            <!-- FPS TILE -->
+            <Border Grid.Column="6" Style="{StaticResource ModernCard}" Padding="12,10">
+                <StackPanel>
+                    <TextBlock Text="🎯 FPS" FontSize="10"
+                               Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Text="{Binding FpsLiveText}" FontSize="18" FontWeight="SemiBold"
+                               Foreground="{DynamicResource AccentBrush}" Margin="0,4,0,2"
+                               TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="{Binding FpsDeltaText}" FontSize="9"
+                               Foreground="{Binding FpsDeltaColor}" Margin="0,2,0,0"
+                               TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="oyun açıkken ölçülür" FontSize="9" Margin="0,4,0,0"
+                               Foreground="{DynamicResource TextSecondary}"
+                               Visibility="{Binding FpsPanelVisibility, Converter={StaticResource BoolToVis}, ConverterParameter=Invert}" />
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- TOGGLE PANELİ + SONUÇ + FPS GRAFİĞİ -->
+        <StackPanel Grid.Row="3" Margin="0,10,0,0">
+            <!-- Toggle -->
+            <Border Style="{StaticResource ModernCard}" Padding="16,12">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" Cursor="Hand" MouseLeftButtonUp="SuspendedDetails_Click"
-                                ToolTip="Hangi süreçler donduruldu? Tıkla">
-                        <TextBlock Text="🧊 Donduruldu ↗" FontSize="11"
-                                   Foreground="{StaticResource AccentBrush}" />
-                        <TextBlock Text="{Binding ResultSuspendedText}" FontSize="14" FontWeight="SemiBold"
-                                   Foreground="{StaticResource TextPrimary}" Margin="0,2,0,0" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="1">
-                        <TextBlock Text="💾 RAM Kazancı" FontSize="11"
-                                   Foreground="{StaticResource TextSecondary}" />
-                        <TextBlock Text="{Binding ResultRamFreedText}" FontSize="14" FontWeight="SemiBold"
-                                   Foreground="{StaticResource AccentBrush}" Margin="0,2,0,0" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Text="⚡ CPU" FontSize="11"
-                                   Foreground="{StaticResource TextSecondary}" />
-                        <TextBlock Text="{Binding ResultCpuDeltaText}" FontSize="14" FontWeight="SemiBold"
-                                   Foreground="{StaticResource TextPrimary}" Margin="0,2,0,0" />
-                    </StackPanel>
-                </Grid>
-                <TextBlock Text="{Binding ResultExtrasText}" FontSize="10"
-                           Foreground="{StaticResource TextSecondary}" Margin="0,8,0,0"
-                           TextWrapping="Wrap" />
-            </StackPanel>
-        </Border>
-
-        <!-- FPS paneli -->
-        <Border Grid.Row="5" Margin="0,12,0,0" Background="#0F1A14"
-                BorderBrush="#1E4F2E" BorderThickness="1"
-                CornerRadius="10" Padding="16,12"
-                Visibility="{Binding FpsPanelVisibility}">
-            <StackPanel>
-                <Grid Margin="0,0,0,6">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="🎯 FPS Ölçümü (PresentMon)"
-                               FontWeight="SemiBold" Foreground="#7FD49F" FontSize="13" />
-                    <TextBlock Grid.Column="1" Text="{Binding FpsLiveText}"
-                               FontSize="16" FontWeight="Bold" Foreground="#FFFFFF" />
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <TextBlock Text="{Binding StatusTitle}" FontSize="15" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextPrimary}" />
+                        <TextBlock Text="{Binding StatusDetail}" FontSize="10"
+                                   Foreground="{DynamicResource TextSecondary}" Margin="0,2,0,0"
+                                   TextWrapping="Wrap" />
+                    </StackPanel>
+                    <ToggleButton Grid.Column="1" Width="64" Height="32"
+                                  IsChecked="{Binding TurboEnabled, Mode=TwoWay}"
+                                  VerticalAlignment="Center" Cursor="Hand">
+                        <ToggleButton.Style>
+                            <Style TargetType="ToggleButton">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="ToggleButton">
+                                            <Border x:Name="Pill" CornerRadius="16" BorderThickness="0">
+                                                <Border.Background>
+                                                    <SolidColorBrush x:Name="PillBg" Color="#2A2A33" />
+                                                </Border.Background>
+                                                <Canvas>
+                                                    <Ellipse x:Name="Knob" Width="26" Height="26" Fill="White" Canvas.Top="3">
+                                                        <Canvas.Left>
+                                                            <System:Double xmlns:System="clr-namespace:System;assembly=mscorlib">3</System:Double>
+                                                        </Canvas.Left>
+                                                    </Ellipse>
+                                                </Canvas>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Trigger.EnterActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation Storyboard.TargetName="Knob"
+                                                                                 Storyboard.TargetProperty="(Canvas.Left)"
+                                                                                 From="3" To="35" Duration="0:0:0.22">
+                                                                    <DoubleAnimation.EasingFunction>
+                                                                        <CubicEase EasingMode="EaseOut"/>
+                                                                    </DoubleAnimation.EasingFunction>
+                                                                </DoubleAnimation>
+                                                                <ColorAnimation Storyboard.TargetName="PillBg"
+                                                                                Storyboard.TargetProperty="Color"
+                                                                                To="#FF7A29" Duration="0:0:0.22" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </Trigger.EnterActions>
+                                                    <Trigger.ExitActions>
+                                                        <BeginStoryboard>
+                                                            <Storyboard>
+                                                                <DoubleAnimation Storyboard.TargetName="Knob"
+                                                                                 Storyboard.TargetProperty="(Canvas.Left)"
+                                                                                 From="35" To="3" Duration="0:0:0.22">
+                                                                    <DoubleAnimation.EasingFunction>
+                                                                        <CubicEase EasingMode="EaseOut"/>
+                                                                    </DoubleAnimation.EasingFunction>
+                                                                </DoubleAnimation>
+                                                                <ColorAnimation Storyboard.TargetName="PillBg"
+                                                                                Storyboard.TargetProperty="Color"
+                                                                                To="#2A2A33" Duration="0:0:0.22" />
+                                                            </Storyboard>
+                                                        </BeginStoryboard>
+                                                    </Trigger.ExitActions>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </ToggleButton.Style>
+                    </ToggleButton>
                 </Grid>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="Baseline" FontSize="10" Foreground="{StaticResource TextSecondary}" />
-                        <TextBlock Text="{Binding FpsBaselineText}" FontSize="13"
-                                   Foreground="{StaticResource TextPrimary}" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="1">
-                        <TextBlock Text="Aktif" FontSize="10" Foreground="{StaticResource TextSecondary}" />
-                        <TextBlock Text="{Binding FpsActiveText}" FontSize="13"
-                                   Foreground="{StaticResource TextPrimary}" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Text="Fark" FontSize="10" Foreground="{StaticResource TextSecondary}" />
-                        <TextBlock Text="{Binding FpsDeltaText}" FontSize="13" FontWeight="SemiBold"
-                                   Foreground="{Binding FpsDeltaColor}" />
-                    </StackPanel>
-                </Grid>
-                <TextBlock Text="⚠ Valorant/Vanguard çalışırken bu pencereyi kapatabilirsiniz."
-                           FontSize="10" Foreground="#AA8866" TextWrapping="Wrap" Margin="0,8,0,0" />
-            </StackPanel>
-        </Border>
+            </Border>
 
-        <!-- Aktif oyun göstergesi + Haftalık özet -->
-        <Grid Grid.Row="6" Margin="0,12,0,0">
+            <!-- Sonuç + grafik tek panel olarak (Turbo aktifken görünür) -->
+            <Border Style="{StaticResource AccentCard}" Padding="14,10" Margin="0,8,0,0"
+                    Visibility="{Binding ResultPanelVisibility}">
+                <StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Grid.Column="0" Cursor="Hand" MouseLeftButtonUp="SuspendedDetails_Click"
+                                    ToolTip="Detaylar için tıkla">
+                            <TextBlock Text="🧊 Donduruldu ↗" FontSize="10"
+                                       Foreground="{DynamicResource AccentBrush}" />
+                            <TextBlock Text="{Binding ResultSuspendedText}" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource TextPrimary}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="💾 RAM" FontSize="10"
+                                       Foreground="{DynamicResource TextSecondary}" />
+                            <TextBlock Text="{Binding ResultRamFreedText}" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{DynamicResource AccentBrush}" Margin="0,2,0,0" />
+                        </StackPanel>
+                        <StackPanel Grid.Column="2">
+                            <TextBlock Text="⚡ FPS" FontSize="10"
+                                       Foreground="{DynamicResource TextSecondary}" />
+                            <TextBlock Text="{Binding FpsDeltaText}" FontSize="12" FontWeight="SemiBold"
+                                       Foreground="{Binding FpsDeltaColor}" Margin="0,2,0,0" />
+                        </StackPanel>
+                    </Grid>
+                    <TextBlock Text="{Binding ResultExtrasText}" FontSize="9"
+                               Foreground="{DynamicResource TextSecondary}" Margin="0,6,0,0"
+                               TextWrapping="Wrap" />
+                </StackPanel>
+            </Border>
+
+            <!-- Live FPS grafiği — sadece oyun açıkken görünür -->
+            <Border CornerRadius="8" Margin="0,8,0,0"
+                    BorderBrush="#1E4F2E" BorderThickness="1"
+                    Visibility="{Binding FpsPanelVisibility}">
+                <views:FpsGraph x:Name="LiveFpsGraph" Height="50" />
+            </Border>
+        </StackPanel>
+
+        <!-- Oyun durumu + Haftalık özet -->
+        <Grid Grid.Row="4" Margin="0,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="12" />
+                <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-
-            <Border Grid.Column="0" Background="{StaticResource PanelBrushDim}"
-                    BorderBrush="{StaticResource BorderBrushDim}" BorderThickness="1"
-                    CornerRadius="8" Padding="14,10">
+            <Border Grid.Column="0" Background="{DynamicResource PanelBrushDim}"
+                    BorderBrush="{DynamicResource BorderBrushDim}" BorderThickness="1"
+                    CornerRadius="8" Padding="12,8">
                 <StackPanel Orientation="Horizontal">
-                    <Ellipse Width="10" Height="10" Fill="{Binding GameStatusColor}"
-                             VerticalAlignment="Center" Margin="0,0,10,0" />
-                    <TextBlock Text="{Binding GameStatus}" Foreground="{StaticResource TextPrimary}"
-                               VerticalAlignment="Center" FontSize="12" />
+                    <Ellipse Width="8" Height="8" Fill="{Binding GameStatusColor}"
+                             VerticalAlignment="Center" Margin="0,0,8,0" />
+                    <TextBlock Text="{Binding GameStatus}" Foreground="{DynamicResource TextPrimary}"
+                               VerticalAlignment="Center" FontSize="11" TextTrimming="CharacterEllipsis" />
                 </StackPanel>
             </Border>
-
-            <Border Grid.Column="2" Background="{StaticResource PanelBrushDim}"
-                    BorderBrush="{StaticResource BorderBrushDim}" BorderThickness="1"
-                    CornerRadius="8" Padding="14,8" Cursor="Hand" MouseLeftButtonUp="History_Click">
+            <Border Grid.Column="2" Background="{DynamicResource PanelBrushDim}"
+                    BorderBrush="{DynamicResource BorderBrushDim}" BorderThickness="1"
+                    CornerRadius="8" Padding="12,8" Cursor="Hand" MouseLeftButtonUp="History_Click">
                 <StackPanel>
-                    <TextBlock Text="{Binding WeeklySummaryText}" Foreground="{StaticResource TextPrimary}"
-                               FontSize="12" FontWeight="SemiBold" />
-                    <TextBlock Text="Bu hafta — Detay için tıkla" FontSize="10"
-                               Foreground="{StaticResource TextSecondary}" />
+                    <TextBlock Text="{Binding WeeklySummaryText}" Foreground="{DynamicResource TextPrimary}"
+                               FontSize="11" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Text="bu hafta — detay için tıkla" FontSize="9"
+                               Foreground="{DynamicResource TextSecondary}" />
                 </StackPanel>
             </Border>
         </Grid>
 
-        <!-- Canlı metrikler -->
-        <Grid Grid.Row="7" Margin="0,12,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="12" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-
-            <Border Grid.Column="0" Background="{StaticResource PanelBrushDim}"
-                    BorderBrush="{StaticResource BorderBrushDim}" BorderThickness="1"
-                    CornerRadius="8" Padding="14,10">
-                <StackPanel>
-                    <TextBlock Text="CPU" FontSize="11" Foreground="{StaticResource TextSecondary}" />
-                    <TextBlock Text="{Binding CpuLabel}" FontSize="20" FontWeight="SemiBold"
-                               Foreground="{StaticResource TextPrimary}" Margin="0,2,0,4" />
-                    <ProgressBar Value="{Binding CpuPercent}" Maximum="100" Height="4"
-                                 Foreground="{StaticResource AccentBrush}" Background="#2A2A33" />
-                </StackPanel>
-            </Border>
-
-            <Border Grid.Column="2" Background="{StaticResource PanelBrushDim}"
-                    BorderBrush="{StaticResource BorderBrushDim}" BorderThickness="1"
-                    CornerRadius="8" Padding="14,10">
-                <StackPanel>
-                    <TextBlock Text="RAM" FontSize="11" Foreground="{StaticResource TextSecondary}" />
-                    <TextBlock Text="{Binding RamLabel}" FontSize="20" FontWeight="SemiBold"
-                               Foreground="{StaticResource TextPrimary}" Margin="0,2,0,4" />
-                    <ProgressBar Value="{Binding RamPercent}" Maximum="100" Height="4"
-                                 Foreground="{StaticResource AccentBrush}" Background="#2A2A33" />
-                </StackPanel>
-            </Border>
-        </Grid>
-
-        <!-- Yüklü oyunlar — yenilenmiş tasarım -->
-        <Border Grid.Row="8" Margin="0,16,0,0" Background="{StaticResource PanelBrushDim}"
-                BorderBrush="{StaticResource BorderBrushDim}" BorderThickness="1"
-                CornerRadius="10" Padding="8">
+        <!-- Oyun listesi -->
+        <Border Grid.Row="5" Style="{StaticResource ModernCard}" Padding="6" Margin="0,10,0,0">
             <DockPanel>
                 <Grid DockPanel.Dock="Top" Margin="8,4,8,6">
                     <Grid.ColumnDefinitions>
@@ -307,9 +466,9 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="🎮 Yüklü Oyunlar"
-                               Foreground="{StaticResource TextPrimary}" FontWeight="SemiBold" FontSize="13" />
+                               Foreground="{DynamicResource TextPrimary}" FontWeight="SemiBold" FontSize="12" />
                     <TextBlock Grid.Column="1" Text="{Binding LibraryStatusText}"
-                               Foreground="{StaticResource TextSecondary}" FontSize="11"
+                               Foreground="{DynamicResource TextSecondary}" FontSize="10"
                                VerticalAlignment="Center" />
                 </Grid>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
@@ -321,7 +480,7 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Width="110" Height="130" Margin="5" CornerRadius="10"
+                                <Border Width="66" Height="80" Margin="3" CornerRadius="8"
                                         Background="#16161D" BorderThickness="0"
                                         Cursor="Hand" MouseLeftButtonUp="Game_Click">
                                     <Border.Style>
@@ -334,7 +493,7 @@
                                         </Style>
                                     </Border.Style>
                                     <Border.Effect>
-                                        <DropShadowEffect Color="Black" BlurRadius="8" ShadowDepth="0" Opacity="0.4" />
+                                        <DropShadowEffect Color="Black" BlurRadius="6" ShadowDepth="0" Opacity="0.3" />
                                     </Border.Effect>
                                     <Border.ToolTip>
                                         <TextBlock>
@@ -344,27 +503,22 @@
                                             <Run Text="{Binding DisplayName}" FontWeight="SemiBold" />
                                             <LineBreak />
                                             <Run Text="{Binding Platform}" Foreground="#AAA" />
-                                            <LineBreak />
-                                            <Run Text="{Binding ExecutablePath}" FontSize="10" Foreground="#888" />
                                         </TextBlock>
                                     </Border.ToolTip>
-                                    <Grid>
-                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                            <Border Width="56" Height="56" CornerRadius="10"
-                                                    Background="#202028" Margin="0,8,0,6">
-                                                <Image Source="{Binding Icon}" Width="44" Height="44"
-                                                       Stretch="Uniform" />
-                                            </Border>
-                                            <TextBlock Text="{Binding DisplayName}"
-                                                       Foreground="{StaticResource TextPrimary}"
-                                                       FontSize="10" TextAlignment="Center"
-                                                       TextWrapping="Wrap" MaxWidth="100"
-                                                       TextTrimming="CharacterEllipsis" MaxHeight="30" />
-                                            <TextBlock Text="{Binding Platform}"
-                                                       Foreground="#FF7A29"
-                                                       FontSize="9" TextAlignment="Center" Margin="0,2,0,0" />
-                                        </StackPanel>
-                                    </Grid>
+                                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
+                                        <Border Width="34" Height="34" CornerRadius="6"
+                                                Background="#202028" Margin="0,4,0,3">
+                                            <Image Source="{Binding Icon}" Width="28" Height="28" Stretch="Uniform" />
+                                        </Border>
+                                        <TextBlock Text="{Binding DisplayName}"
+                                                   Foreground="{DynamicResource TextPrimary}"
+                                                   FontSize="8" TextAlignment="Center"
+                                                   TextWrapping="Wrap" MaxWidth="60"
+                                                   TextTrimming="CharacterEllipsis" MaxHeight="20" />
+                                        <TextBlock Text="{Binding Platform}"
+                                                   Foreground="#FF7A29"
+                                                   FontSize="7" TextAlignment="Center" Margin="0,1,0,0" />
+                                    </StackPanel>
                                 </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
@@ -373,60 +527,94 @@
             </DockPanel>
         </Border>
 
-        <!-- Discord + GitHub destek butonları -->
-        <Grid Grid.Row="9" Margin="0,14,0,0">
+        <!-- Discord + GitHub butonları — kompakt -->
+        <Grid Grid.Row="6" Margin="0,10,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="10" />
+                <ColumnDefinition Width="8" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-
-            <Border Grid.Column="0" Background="#252A4D"
-                    BorderBrush="#5865F2" BorderThickness="1" CornerRadius="10"
-                    Cursor="Hand" MouseLeftButtonUp="Discord_Click">
-                <Grid Margin="14,10">
+            <Border Grid.Column="0" Background="#252A4D" BorderBrush="#5865F2" BorderThickness="1"
+                    CornerRadius="8" Cursor="Hand" MouseLeftButtonUp="Discord_Click">
+                <Grid Margin="12,7">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="💬" FontSize="20" VerticalAlignment="Center"
-                               Margin="0,0,10,0" />
+                    <Image Grid.Column="0" Source="/Resources/discord.png" Width="22" Height="22"
+                           VerticalAlignment="Center" Margin="0,0,10,0" />
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="Discord Destek" Foreground="White"
-                                   FontWeight="SemiBold" FontSize="12" />
-                        <TextBlock Text="peacefox — adı kopyalanır"
-                                   Foreground="#B8BCDB" FontSize="10" />
+                        <TextBlock Text="Discord Destek" Foreground="White" FontWeight="SemiBold" FontSize="11" />
+                        <TextBlock Text="peacefox — kopyala" Foreground="#B8BCDB" FontSize="9" />
                     </StackPanel>
                 </Grid>
             </Border>
-
-            <Border Grid.Column="2" Background="#1A1A20"
-                    BorderBrush="#444" BorderThickness="1" CornerRadius="10"
-                    Cursor="Hand" MouseLeftButtonUp="GitHub_Click">
-                <Grid Margin="14,10">
+            <Border Grid.Column="2" Background="#1A1A20" BorderBrush="#444" BorderThickness="1"
+                    CornerRadius="8" Cursor="Hand" MouseLeftButtonUp="GitHub_Click">
+                <Grid Margin="12,7">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="⭐" FontSize="20" VerticalAlignment="Center"
-                               Margin="0,0,10,0" />
+                    <Image Grid.Column="0" Source="/Resources/github.png" Width="22" Height="22"
+                           VerticalAlignment="Center" Margin="0,0,10,0" />
                     <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                        <TextBlock Text="GitHub" Foreground="White"
-                                   FontWeight="SemiBold" FontSize="12" />
-                        <TextBlock Text="baristilki/foxturbomod"
-                                   Foreground="#999" FontSize="10" />
+                        <TextBlock Text="GitHub" Foreground="White" FontWeight="SemiBold" FontSize="11" />
+                        <TextBlock Text="baristilki/foxturbomod" Foreground="#999" FontSize="9" />
                     </StackPanel>
                 </Grid>
             </Border>
         </Grid>
 
-        <!-- Sistem durumu + footer -->
-        <StackPanel Grid.Row="10" HorizontalAlignment="Center" Margin="0,10,0,0">
-            <TextBlock Text="{Binding SystemStateLabel}" FontSize="10"
+        <!-- Network ping mini panel -->
+        <Border Grid.Row="7" Margin="0,8,0,0" Background="{DynamicResource PanelBrushDim}"
+                BorderBrush="{DynamicResource BorderBrushDim}" BorderThickness="1"
+                CornerRadius="8" Padding="10,6">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="📶 Ping" FontSize="9" FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,8,0" />
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="Cloudflare" FontSize="8" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Text="{Binding PingCloudflare}" FontSize="11" FontWeight="SemiBold"
+                               Foreground="{DynamicResource AccentBrush}" />
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Text="Google" FontSize="8" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Text="{Binding PingGoogle}" FontSize="11" FontWeight="SemiBold"
+                               Foreground="{DynamicResource AccentBrush}" />
+                </StackPanel>
+                <StackPanel Grid.Column="3">
+                    <TextBlock Text="Discord" FontSize="8" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Text="{Binding PingDiscord}" FontSize="11" FontWeight="SemiBold"
+                               Foreground="{DynamicResource AccentBrush}" />
+                </StackPanel>
+                <StackPanel Grid.Column="4">
+                    <TextBlock Text="Steam" FontSize="8" Foreground="{DynamicResource TextSecondary}" />
+                    <TextBlock Text="{Binding PingSteam}" FontSize="11" FontWeight="SemiBold"
+                               Foreground="{DynamicResource AccentBrush}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Footer -->
+        <StackPanel Grid.Row="8" HorizontalAlignment="Center" Margin="0,8,0,0">
+            <TextBlock Text="{Binding SystemStateLabel}" FontSize="9"
                        Foreground="{Binding SystemStateColor}" HorizontalAlignment="Center" />
-            <TextBlock Text="{Binding FooterText}" FontSize="11"
-                       Foreground="{StaticResource TextSecondary}"
-                       HorizontalAlignment="Center" Margin="0,4,0,0" />
+            <TextBlock Text="{Binding FooterText}" FontSize="9"
+                       Foreground="{DynamicResource TextSecondary}"
+                       HorizontalAlignment="Center" Margin="0,2,0,0" />
+            <TextBlock FontSize="9" HorizontalAlignment="Center" Margin="0,2,0,0">
+                <Hyperlink Click="ShowOnboarding_Click" Foreground="{DynamicResource AccentBrush}">
+                    👋 Karşılama Turu'nu tekrar göster
+                </Hyperlink>
+            </TextBlock>
         </StackPanel>
     </Grid>
 </Window>

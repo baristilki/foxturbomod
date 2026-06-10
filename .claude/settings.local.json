@@ -7,7 +7,17 @@
       "Read(//c/Program Files/dotnet/**)",
       "Bash(find \"/c/Users/PC\" -iname \"*fox_007*\" 2>/dev/null | head -10; echo \"---\"; ls \"/c/Users/PC/Downloads/\" 2>/dev/null | head -20)",
       "Read(//c/Users/PC/**)",
-      "Read(//c/Users/PC/Downloads//**)"
+      "Read(//c/Users/PC/Downloads//**)",
+      "Bash(git fetch *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(git push *)",
+      "Bash(git rm *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git ls-remote *)",
+      "Bash(git tag *)",
+      "Bash(git checkout *)"
     ]
   }
 }

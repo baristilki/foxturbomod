@@ -5,7 +5,7 @@
         ui:WindowHelper.UseModernWindowStyle="True"
         Title="Sistem Önerileri" Height="720" Width="640"
         WindowStartupLocation="CenterOwner"
-        Background="#0E0E13" Icon="/Resources/FoxMod.ico">
+        Background="{DynamicResource WindowBackground}" Icon="/Resources/FoxMod.ico">
 
     <Grid Margin="20">
         <Grid.RowDefinitions>
@@ -16,11 +16,11 @@
 
         <TextBlock Grid.Row="0" Text="🚀 FPS Önerileri"
                    FontSize="18" FontWeight="SemiBold"
-                   Foreground="{StaticResource TextPrimary}" />
+                   Foreground="{DynamicResource TextPrimary}" />
         <TextBlock Grid.Row="1" Margin="0,4,0,16" TextWrapping="Wrap"
-                   Foreground="{StaticResource TextSecondary}" FontSize="12">
+                   Foreground="{DynamicResource TextSecondary}" FontSize="12">
             Sistemini analiz ettim. Aşağıdaki öneriler — bazıları otomatik uygulanabilir,
-            bazıları manuel rehber gerektiriyor. <Run FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}">Her birinin FPS etkisi belirtildi.</Run>
+            bazıları manuel rehber gerektiriyor. <Run FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}">Her birinin FPS etkisi belirtildi.</Run>
         </TextBlock>
 
         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
@@ -46,7 +46,7 @@
                                     <StackPanel Orientation="Horizontal">
                                         <TextBlock Text="{Binding Item.Title}"
                                                    FontWeight="SemiBold" FontSize="13"
-                                                   Foreground="{StaticResource TextPrimary}" />
+                                                   Foreground="{DynamicResource TextPrimary}" />
                                         <Border Background="{Binding ImpactBrush}"
                                                 CornerRadius="6" Padding="6,1" Margin="8,2,0,0"
                                                 Visibility="{Binding HasImpact, Converter={StaticResource BoolToVis}}">
@@ -55,7 +55,7 @@
                                         </Border>
                                     </StackPanel>
                                     <TextBlock Text="{Binding Item.Description}"
-                                               Foreground="{StaticResource TextSecondary}"
+                                               Foreground="{DynamicResource TextSecondary}"
                                                FontSize="11" TextWrapping="Wrap" Margin="0,4,0,0"
                                                LineHeight="16" />
                                 </StackPanel>
@@ -65,8 +65,8 @@
                                         VerticalAlignment="Top" Margin="12,0,0,0"
                                         Padding="10,4" Cursor="Hand"
                                         Background="Transparent"
-                                        BorderBrush="{StaticResource AccentBrush}"
-                                        Foreground="{StaticResource AccentBrush}"
+                                        BorderBrush="{DynamicResource AccentBrush}"
+                                        Foreground="{DynamicResource AccentBrush}"
                                         Click="Action_Click" Tag="{Binding Item}" />
                             </Grid>
                         </Border>

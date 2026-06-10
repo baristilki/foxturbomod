@@ -2,11 +2,18 @@ using TurboMode.Models;
 
 namespace TurboMode.Services;
 
+public static class RecommendationsServiceHelpers
+{
+    public static string LastNetworkSummary = "ölçülüyor...";
+    public static string LastDriverSummary = "okunuyor...";
+}
+
 public static class RecommendationsService
 {
     public static List<Recommendation> Build(SystemStateChecker.SystemState state)
     {
         var list = new List<Recommendation>();
+        AddDriverScanCard(list);
 
         // VBS / HVCI — direkt kapat butonu
         if (state.VbsEnabled || state.HvciEnabled)
@@ -174,6 +181,19 @@ public static class RecommendationsService
             ActionCommand = "clear-shader-cache",
         });
 
+        // TEMP klasörleri temizleme
+        list.Add(new Recommendation
+        {
+            IconEmoji = "🧹",
+            Severity = RecommendationSeverity.Info,
+            Title = "Windows TEMP klasörlerini temizle",
+            Description =
+                "%TEMP% ve C:\\Windows\\Temp klasörlerindeki kullanılmayan dosyaları siler. " +
+                "Tipik kazanç 500MB-3GB. Kullanımdaki dosyalar atlanır — sıfır risk.",
+            ActionLabel = "TEMP'i Temizle",
+            ActionCommand = "clean-temp",
+        });
+
         // Background Apps (Microsoft Store)
         list.Add(new Recommendation
         {
@@ -240,5 +260,20 @@ public static class RecommendationsService
         });
 
         return list;
+    }
+
+    private static void AddDriverScanCard(List<Recommendation> list)
+    {
+        list.Add(new Recommendation
+        {
+            IconEmoji = "💿",
+            Severity = RecommendationSeverity.Info,
+            Title = "Sürücü Taraması",
+            Description =
+                "GPU, ses, ağ ve chipset sürücülerini tarar. 1+ yıl eski olanları sarı, 2+ yıl eski olanları kırmızı işaretler. " +
+                "Sürücü güncelleme oyun stutter'larını ve crash'leri çözer.",
+            ActionLabel = "Taramayı Aç",
+            ActionCommand = "open-driver-scan",
+        });
     }
 }

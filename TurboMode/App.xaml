@@ -7,22 +7,138 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <!-- Tema kaynakları (ThemeManager runtime'da değiştirir) -->
+                <ResourceDictionary Source="Themes/FoxTheme.xaml" />
                 <ui:ThemeResources RequestedTheme="Dark" />
                 <ui:XamlControlsResources />
             </ResourceDictionary.MergedDictionaries>
 
-            <!-- Renk paleti -->
-            <Color x:Key="AccentColor">#FF7A29</Color>
-            <Color x:Key="AccentColorDim">#A04A1A</Color>
-            <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
-            <SolidColorBrush x:Key="PanelBrush" Color="#1A1A20" />
-            <SolidColorBrush x:Key="PanelBrushDim" Color="#15151B" />
-            <SolidColorBrush x:Key="BorderBrushDim" Color="#2A2A33" />
-            <SolidColorBrush x:Key="TextPrimary" Color="#F0F0F0" />
-            <SolidColorBrush x:Key="TextSecondary" Color="#909098" />
-
             <!-- Bool -> Visibility -->
             <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+            <!-- Hızlı, şık tooltip stili — 250ms gecikme, tema-uyumlu -->
+            <Style TargetType="ToolTip">
+                <Setter Property="Background" Value="{DynamicResource PanelBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Padding" Value="10,6" />
+                <Setter Property="FontSize" Value="11" />
+            </Style>
+            <Style x:Key="TooltipStyle" TargetType="FrameworkElement">
+                <Setter Property="ToolTipService.InitialShowDelay" Value="250" />
+                <Setter Property="ToolTipService.BetweenShowDelay" Value="100" />
+            </Style>
+
+            <!-- Modern Card Style — drop shadow + hover scale -->
+            <Style x:Key="ModernCard" TargetType="Border">
+                <Setter Property="Background" Value="{DynamicResource PanelBrush}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushDim}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="12" />
+                <Setter Property="Effect">
+                    <Setter.Value>
+                        <DropShadowEffect Color="Black" BlurRadius="12" ShadowDepth="0" Opacity="0.35" />
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <Style x:Key="AccentCard" TargetType="Border" BasedOn="{StaticResource ModernCard}">
+                <Setter Property="Background" Value="{DynamicResource HighlightPanelBg}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+            </Style>
+
+            <!-- Modern button — hover'da accent glow -->
+            <Style x:Key="ModernButton" TargetType="Button">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushDim}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+                <Setter Property="Padding" Value="10,6" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="6">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                  Margin="{TemplateBinding Padding}" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="BorderBrush"
+                                            Value="{DynamicResource AccentBrush}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Header için ikon + alt yazılı buton -->
+            <Style x:Key="LabeledIconButton" TargetType="Button">
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="BorderBrush" Value="{DynamicResource BorderBrushDim}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Width" Value="58" />
+                <Setter Property="Height" Value="50" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bd" Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bd" Property="BorderBrush"
+                                            Value="{DynamicResource AccentBrush}" />
+                                    <Setter TargetName="Bd" Property="Background"
+                                            Value="{DynamicResource HighlightPanelChip}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Modern toggle switch (pill stilinde) — CheckBox şablonu -->
+            <Style x:Key="ToggleSwitchStyle" TargetType="CheckBox">
+                <Setter Property="Foreground" Value="{DynamicResource TextPrimary}" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="CheckBox">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Border Grid.Column="0" x:Name="Pill" Width="44" Height="22"
+                                        Background="#2A2A33" CornerRadius="11" Margin="0,0,12,0">
+                                    <Ellipse x:Name="Knob" Width="16" Height="16" Fill="White"
+                                             HorizontalAlignment="Left" Margin="3,0,0,0" />
+                                </Border>
+                                <ContentPresenter Grid.Column="1" VerticalAlignment="Center"
+                                                  TextElement.Foreground="{TemplateBinding Foreground}" />
+                            </Grid>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="Pill" Property="Background"
+                                            Value="{DynamicResource AccentBrush}" />
+                                    <Setter TargetName="Knob" Property="HorizontalAlignment" Value="Right" />
+                                    <Setter TargetName="Knob" Property="Margin" Value="0,0,3,0" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

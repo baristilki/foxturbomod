@@ -5,18 +5,17 @@ using Application = System.Windows.Application;
 
 namespace TurboMode.Services;
 
-/// <summary>
-/// Windows tepsi ikonu — pencere kapanınca/minimize edilince tepsiye gider.
-/// WinForms NotifyIcon kullanıyoruz (ek paket gerekmez, .NET 8 ile gelir).
-/// </summary>
 public sealed class TrayIconHost : IDisposable
 {
     private NotifyIcon? _icon;
     private Window? _mainWindow;
+    private Func<List<(string label, Action action)>>? _menuBuilder;
 
-    public void Initialize(Window mainWindow, string iconResourcePath, string tooltip)
+    public void Initialize(Window mainWindow, string iconResourcePath, string tooltip,
+        Func<List<(string label, Action action)>>? menuBuilder = null)
     {
         _mainWindow = mainWindow;
+        _menuBuilder = menuBuilder;
 
         _icon = new NotifyIcon
         {
@@ -34,12 +33,42 @@ public sealed class TrayIconHost : IDisposable
             _icon.Icon = SystemIcons.Application;
         }
 
-        var menu = new ContextMenuStrip();
-        menu.Items.Add("Aç", null, (_, _) => ShowWindow());
-        menu.Items.Add("-");
-        menu.Items.Add("Çıkış", null, (_, _) => ExitApp());
-        _icon.ContextMenuStrip = menu;
+        _icon.MouseUp += (_, e) =>
+        {
+            if (e.Button == MouseButtons.Right)
+                ShowMenu();
+        };
         _icon.DoubleClick += (_, _) => ShowWindow();
+    }
+
+    private void ShowMenu()
+    {
+        if (_menuBuilder == null)
+        {
+            // Eski basit menü
+            var basic = new ContextMenuStrip();
+            basic.Items.Add("Aç", null, (_, _) => ShowWindow());
+            basic.Items.Add("Çıkış", null, (_, _) => Application.Current.Shutdown());
+            _icon!.ContextMenuStrip = basic;
+            return;
+        }
+
+        try
+        {
+            var menu = new ContextMenuStrip();
+            foreach (var (label, action) in _menuBuilder())
+            {
+                if (label == "──") menu.Items.Add(new ToolStripSeparator());
+                else
+                {
+                    var captured = action;
+                    menu.Items.Add(label, null, (_, _) => captured());
+                }
+            }
+            _icon!.ContextMenuStrip = menu;
+            _icon.ContextMenuStrip.Show(Control.MousePosition);
+        }
+        catch (Exception ex) { Log.Error(ex, "Tray menü göster hatası"); }
     }
 
     private void ShowWindow()
@@ -48,12 +77,6 @@ public sealed class TrayIconHost : IDisposable
         _mainWindow.Show();
         _mainWindow.WindowState = WindowState.Normal;
         _mainWindow.Activate();
-    }
-
-    private void ExitApp()
-    {
-        Dispose();
-        Application.Current.Shutdown();
     }
 
     public void ShowBalloon(string title, string text)

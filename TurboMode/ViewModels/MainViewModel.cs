@@ -19,6 +19,9 @@ public partial class MainViewModel : ObservableObject
     private readonly SystemMetrics _metrics;
     private readonly GameLibraryScanner _scanner = new();
     private readonly FpsMonitor _fps = new();
+    public FpsMonitor Fps => _fps;
+    private readonly HardwareMonitor _hw = new();
+    public ResourceHogsMonitor Hogs { get; } = new();
 
     public AppSettings Settings { get; private set; }
 
@@ -53,6 +56,23 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private string _versionLabel =
         "v" + (Assembly.GetExecutingAssembly().GetName().Version?.ToString(3) ?? "?.?.?");
     [ObservableProperty] private string _uptimeLabel = "🕒 Aktif: 0 dk";
+    // Network ping (4 hedef)
+    [ObservableProperty] private string _pingCloudflare = "—";
+    [ObservableProperty] private string _pingGoogle = "—";
+    [ObservableProperty] private string _pingDiscord = "—";
+    [ObservableProperty] private string _pingSteam = "—";
+
+    // Hardware sensörleri
+    [ObservableProperty] private string _cpuName = "CPU";
+    [ObservableProperty] private string _cpuTempLabel = "—";
+    [ObservableProperty] private double _cpuTemp;
+    [ObservableProperty] private double _cpuLoad;
+    [ObservableProperty] private Brush _cpuTempColor = new SolidColorBrush(Color.FromRgb(0x7F, 0xD4, 0x9F));
+    [ObservableProperty] private string _gpuName = "GPU";
+    [ObservableProperty] private string _gpuTempLabel = "—";
+    [ObservableProperty] private double _gpuTemp;
+    [ObservableProperty] private double _gpuLoad;
+    [ObservableProperty] private Brush _gpuTempColor = new SolidColorBrush(Color.FromRgb(0x7F, 0xD4, 0x9F));
     private readonly DateTime _appStartedAt = DateTime.Now;
     [ObservableProperty] private string _weeklySummaryText = "Henüz veri yok";
     [ObservableProperty] private string _updateBanner = "";
@@ -77,6 +97,28 @@ public partial class MainViewModel : ObservableObject
     [ObservableProperty] private Brush _systemStateColor = new SolidColorBrush(Color.FromRgb(0x90, 0x90, 0x98));
 
     [ObservableProperty] private bool _aboutOpen;
+
+    // Overlay aktif mi (📺 buton rengi için)
+    [ObservableProperty] private bool _overlayActive;
+    [ObservableProperty] private Brush _overlayButtonBg = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+    [ObservableProperty] private Brush _overlayButtonBorder = new SolidColorBrush(Color.FromRgb(0x2A, 0x2A, 0x33));
+    [ObservableProperty] private Brush _overlayButtonFg = new SolidColorBrush(Color.FromRgb(0xF0, 0xF0, 0xF0));
+
+    partial void OnOverlayActiveChanged(bool value)
+    {
+        if (value)
+        {
+            OverlayButtonBg = new SolidColorBrush(Color.FromRgb(0x2A, 0x1F, 0x14));
+            OverlayButtonBorder = new SolidColorBrush(Color.FromRgb(0xFF, 0x7A, 0x29));
+            OverlayButtonFg = new SolidColorBrush(Color.FromRgb(0xFF, 0x7A, 0x29));
+        }
+        else
+        {
+            OverlayButtonBg = new SolidColorBrush(Color.FromArgb(0, 0, 0, 0));
+            OverlayButtonBorder = new SolidColorBrush(Color.FromRgb(0x2A, 0x2A, 0x33));
+            OverlayButtonFg = new SolidColorBrush(Color.FromRgb(0xF0, 0xF0, 0xF0));
+        }
+    }
 
     public ObservableCollection<InstalledGame> InstalledGames { get; } = new();
     public IRelayCommand ToggleAboutCommand { get; }
@@ -104,17 +146,40 @@ public partial class MainViewModel : ObservableObject
         _detector.GameStopped += OnGameStopped;
         _detector.Start();
 
-        // Açılışta zaten çalışan oyunu UI'da göster ama Turbo'yu otomatik açma
+        // Açılışta zaten çalışan oyunu UI'da göster + FPS monitor'u başlat (Turbo otomatik açılmaz)
         if (!string.IsNullOrEmpty(_detector.CurrentGame))
         {
             GameStatus = $"Algılandı: {_detector.CurrentGame}";
             GameStatusColor = new SolidColorBrush(Color.FromRgb(0xFF, 0x7A, 0x29));
+            // FPS Monitor başlat — kullanıcı oyuna girmiş, ölçmeye başla
+            var procName = _detector.CurrentGameProcess;
+            if (Settings.EnableFpsMonitor && !string.IsNullOrEmpty(procName) && _fps.Start(procName))
+            {
+                FpsPanelVisibility = Visibility.Visible;
+                FpsLiveText = "ölçülüyor...";
+                Log.Info("FPS Monitor başlatıldı (açılış-zamanı tespit): {0}", procName);
+            }
         }
 
-        _fps.FpsUpdated += fps =>
+        // FPS UI'sı için ayrı timer
+        var fpsUiTimer = new DispatcherTimer(DispatcherPriority.Background)
+        { Interval = TimeSpan.FromMilliseconds(500) };
+        int debugTickCounter = 0;
+        fpsUiTimer.Tick += (_, _) =>
         {
-            App.Current.Dispatcher.BeginInvoke(new Action(() => FpsLiveText = $"{fps:0} FPS"));
+            string newText;
+            if (!_fps.IsRunning) newText = "—";
+            else
+            {
+                var avg = _fps.AverageFps(3);
+                newText = avg > 5 ? $"{avg:0} FPS" : "ölçülüyor...";
+            }
+            FpsLiveText = newText;
+            // Her 10 saniyede bir UI değerini log'a yaz (debug)
+            if (++debugTickCounter % 20 == 0)
+                Log.Info($"UI FpsLiveText set: '{newText}' (FpsMonitor IsRunning={_fps.IsRunning}, sampleCount={_fps.SampleCount})");
         };
+        fpsUiTimer.Start();
 
         ToggleAboutCommand = new RelayCommand(() => AboutOpen = !AboutOpen);
         _ = ScanLibraryAsync();
@@ -122,7 +187,74 @@ public partial class MainViewModel : ObservableObject
         _ = Task.Run(CheckUpdateAsync);
         RefreshWeeklySummary();
         StartUptimeTimer();
+
+        _hw.Updated += h =>
+        {
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                CpuName = ShortenChip(h.CpuName);
+                if (h.CpuTempC > 0) { CpuTemp = h.CpuTempC; CpuTempLabel = $"{h.CpuTempC:0}°"; CpuTempColor = TempColor(h.CpuTempC); }
+                else CpuTempLabel = "—";
+                CpuLoad = h.CpuLoadPercent;
+
+                GpuName = ShortenChip(h.GpuName);
+                if (h.GpuTempC > 0) { GpuTemp = h.GpuTempC; GpuTempLabel = $"{h.GpuTempC:0}°"; GpuTempColor = TempColor(h.GpuTempC); }
+                else GpuTempLabel = "—";
+                GpuLoad = h.GpuLoadPercent;
+            });
+        };
+        _hw.Start();
+        Hogs.Start();
+        StartNetworkPing();
     }
+
+    private void StartNetworkPing()
+    {
+        var t = new DispatcherTimer(DispatcherPriority.Background)
+        { Interval = TimeSpan.FromSeconds(15) };
+        t.Tick += async (_, _) => await ProbeNetwork();
+        t.Start();
+        _ = ProbeNetwork();
+    }
+
+    private async Task ProbeNetwork()
+    {
+        try
+        {
+            var results = await NetworkProbe.ProbeAsync();
+            App.Current.Dispatcher.Invoke(() =>
+            {
+                foreach (var r in results)
+                {
+                    var txt = r.Success ? $"{r.PingMs} ms" : "✗";
+                    switch (r.Target)
+                    {
+                        case "Cloudflare DNS": PingCloudflare = txt; break;
+                        case "Google DNS": PingGoogle = txt; break;
+                        case "Discord": PingDiscord = txt; break;
+                        case "Steam": PingSteam = txt; break;
+                    }
+                }
+            });
+        }
+        catch (Exception ex) { Log.Error(ex, "MainVM ProbeNetwork hatası"); }
+    }
+
+    private static string ShortenChip(string name)
+    {
+        return name
+            .Replace("Intel(R) ", "").Replace("Intel ", "")
+            .Replace("AMD ", "")
+            .Replace("NVIDIA GeForce ", "")
+            .Replace(" CPU", "").Replace("(R)", "").Replace("(TM)", "").Trim();
+    }
+
+    private static Brush TempColor(float t) => t switch
+    {
+        >= 85 => new SolidColorBrush(Color.FromRgb(0xE0, 0x40, 0x40)),
+        >= 75 => new SolidColorBrush(Color.FromRgb(0xCC, 0x99, 0x33)),
+        _ => new SolidColorBrush(Color.FromRgb(0x7F, 0xD4, 0x9F)),
+    };
 
     private void StartUptimeTimer()
     {
@@ -361,7 +493,14 @@ public partial class MainViewModel : ObservableObject
             _activeFps = 0;
             _fps.Stop();
             FpsPanelVisibility = Visibility.Collapsed;
-            if (TurboEnabled) TurboEnabled = false;
+            // Oyun bittiyse açık overlay'i de kapat
+            try
+            {
+                foreach (var w in System.Windows.Application.Current.Windows.OfType<Views.OverlayWindow>().ToList())
+                    w.Close();
+                OverlayActive = false;
+            }
+            catch { }
         });
     }
 }

@@ -31,10 +31,29 @@ public sealed class FpsMonitor : IDisposable
         _watchedProcess = gameProcessName;
         // PresentMon v2: argümanlar değişti.
         // -process_name X.exe -output_stdout -terminate_existing_session
-        var args = $"--process_name {gameProcessName}.exe --output_stdout --terminate_existing --stop_existing_session";
+        // ÖNEMLİ: process adı boşluk içerebilir (League of Legends.exe), tırnak ŞART
+        // Adım 1: Eski ETW session'ları temizle (PresentMon ayrı çağrılır, hiç capture yapmaz)
+        try
+        {
+            var cleanup = new ProcessStartInfo(PresentMonBundle.ExtractedPath, "--terminate_existing_session")
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            };
+            using var c = Process.Start(cleanup);
+            c?.WaitForExit(2000);
+            Log.Info("PresentMon eski session temizlendi");
+        }
+        catch (Exception ex) { Log.Warn("Cleanup hatası: {0}", ex.Message); }
+
+        // Adım 2: Capture başlat — sadece process_name + output_stdout
+        var args = $"--process_name \"{gameProcessName}.exe\" --output_stdout";
 
         try
         {
+            Log.Info("FpsMonitor: PresentMon başlatılıyor → {0} {1}", PresentMonBundle.ExtractedPath, args);
             _process = Process.Start(new ProcessStartInfo(PresentMonBundle.ExtractedPath, args)
             {
                 UseShellExecute = false,
@@ -43,12 +62,27 @@ public sealed class FpsMonitor : IDisposable
                 CreateNoWindow = true,
                 StandardOutputEncoding = System.Text.Encoding.UTF8,
             });
-            if (_process == null) return false;
+            if (_process == null) { Log.Warn("FpsMonitor: process null"); return false; }
+            Log.Info("FpsMonitor: PresentMon PID={0}", _process.Id);
 
             _ = Task.Run(ReadLoop);
+            _ = Task.Run(async () =>
+            {
+                // PresentMon stderr — hata mesajları (PID bulunamadı vs.)
+                try
+                {
+                    while (!_process.HasExited)
+                    {
+                        var line = await _process.StandardError.ReadLineAsync();
+                        if (line == null) break;
+                        Log.Warn("PresentMon stderr: {0}", line);
+                    }
+                }
+                catch { }
+            });
             return true;
         }
-        catch { return false; }
+        catch (Exception ex) { Log.Error(ex, "FpsMonitor start hatası"); return false; }
     }
 
     private async Task ReadLoop()
@@ -57,26 +91,34 @@ public sealed class FpsMonitor : IDisposable
         var sr = _process.StandardOutput;
         bool headerSkipped = false;
         int frameMsCol = -1;
+        int linesRead = 0;
 
         while (!_process.HasExited)
         {
             string? line = await sr.ReadLineAsync();
             if (line == null) break;
             if (line.Length == 0) continue;
+            linesRead++;
 
             if (!headerSkipped)
             {
-                // CSV header'ı bul; "msBetweenPresents" veya "MsBetweenPresents" sütununu yakalayalım
-                var cols = line.Split(',');
+                Log.Info("PresentMon header: {0}", line);
+                // PresentMon v2: "MsBetweenPresents" veya "TimeInSeconds" sütunları var
+                var cols = line.Split(',').Select(c => c.Trim()).ToArray();
                 for (int i = 0; i < cols.Length; i++)
                 {
                     if (cols[i].Equals("MsBetweenPresents", StringComparison.OrdinalIgnoreCase) ||
-                        cols[i].Equals("msBetweenPresents", StringComparison.OrdinalIgnoreCase))
+                        cols[i].Equals("msBetweenPresents", StringComparison.OrdinalIgnoreCase) ||
+                        cols[i].Equals("FrameTime", StringComparison.OrdinalIgnoreCase) ||
+                        cols[i].Equals("CPUDuration", StringComparison.OrdinalIgnoreCase))
                     {
                         frameMsCol = i;
+                        Log.Info("FpsMonitor: frame time sütun bulundu: {0} (index {1})", cols[i], i);
                         break;
                     }
                 }
+                if (frameMsCol < 0)
+                    Log.Warn("FpsMonitor: frame time sütun bulunamadı. Sütunlar: {0}", string.Join(",", cols));
                 headerSkipped = true;
                 continue;
             }
@@ -89,13 +131,18 @@ public sealed class FpsMonitor : IDisposable
             if (ms <= 0 || ms > 1000) continue;
 
             var now = DateTime.UtcNow;
+            int totalSamples;
             lock (_lock)
             {
                 _samples.AddLast((now, ms));
                 while (_samples.Count > 0 &&
                        (now - _samples.First!.Value.At).TotalSeconds > MaxHistorySeconds)
                     _samples.RemoveFirst();
+                totalSamples = _samples.Count;
             }
+            // Her 300. sample'da bir log
+            if (totalSamples % 300 == 0)
+                Log.Info($"FPS sample #{totalSamples}: frameMs={ms:0.00}, instant FPS={1000.0/ms:0.0}, avg(3s)={AverageFps(3):0.0}");
             FpsUpdated?.Invoke(1000.0 / ms);
         }
     }

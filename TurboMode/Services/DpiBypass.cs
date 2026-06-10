@@ -23,7 +23,9 @@ public sealed class DpiBypass : IDisposable
 
     private Process? _process;
 
-    public bool IsRunning => _process != null && !_process.HasExited;
+    public bool IsRunning =>
+        (_process != null && !_process.HasExited) ||
+        System.Diagnostics.Process.GetProcessesByName("goodbyedpi").Any();
 
     public sealed record Result(bool Success, string Message);
 
@@ -59,15 +61,19 @@ public sealed class DpiBypass : IDisposable
 
     public Result Stop()
     {
-        if (!IsRunning) return new Result(true, "GoodbyeDPI zaten kapalı.");
-        try
+        // Tüm goodbyedpi.exe instance'larını öldür (önceki Fox kapanmış olabilir)
+        int killed = 0;
+        foreach (var p in System.Diagnostics.Process.GetProcessesByName("goodbyedpi"))
         {
-            _process!.Kill(entireProcessTree: true);
-            _process.Dispose();
-            _process = null;
-            return new Result(true, "GoodbyeDPI durduruldu.");
+            try { p.Kill(entireProcessTree: true); killed++; }
+            catch { }
+            finally { p.Dispose(); }
         }
-        catch (Exception ex) { return new Result(false, ex.Message); }
+        try { _process?.Dispose(); } catch { }
+        _process = null;
+        return killed > 0
+            ? new Result(true, $"GoodbyeDPI durduruldu ({killed} process).")
+            : new Result(true, "GoodbyeDPI zaten kapalı.");
     }
 
     public Result OpenDiscordWithBypass()

@@ -7,9 +7,9 @@
     <AssemblyName>FoxTurboMod</AssemblyName>
     <Product>Fox Turbo Mod</Product>
     <Company>Fox Turbo Mod</Company>
-    <Version>1.5.0</Version>
-    <FileVersion>1.5.0</FileVersion>
-    <AssemblyVersion>1.5.0</AssemblyVersion>
+    <Version>2.0.0</Version>
+    <FileVersion>2.0.0</FileVersion>
+    <AssemblyVersion>2.0.0</AssemblyVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
@@ -24,6 +24,8 @@
     <Resource Include="Resources\FoxMod.ico" />
     <Resource Include="Resources\FoxLogo.png" />
     <Resource Include="Resources\default_game.png" />
+    <Resource Include="Resources\discord.png" />
+    <Resource Include="Resources\github.png" />
     <EmbeddedResource Include="Resources\PresentMon.exe">
       <LogicalName>PresentMon.exe</LogicalName>
     </EmbeddedResource>
@@ -41,9 +43,10 @@
   <ItemGroup>
     <PackageReference Include="ModernWpfUI" Version="0.9.6" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
-    <PackageReference Include="System.Management" Version="8.0.0" />
+    <PackageReference Include="System.Management" Version="9.0.0" />
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="8.0.0" />
     <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.4" />
   </ItemGroup>
 
 </Project>
